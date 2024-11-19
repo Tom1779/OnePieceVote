@@ -1,8 +1,17 @@
 import Image from "next/image";
 
 export default function ImageModal({ src, alt, onClose }) {
+  const handleBackdropClick = (e) => {
+    // Close the modal only if the backdrop is clicked
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
+      onClick={handleBackdropClick} // Handle clicks on the backdrop
+    >
       <div className="relative">
         <Image
           src={src}
