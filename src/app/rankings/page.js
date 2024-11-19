@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { supabase } from "../contexts/auth-context";
+import { supabase } from "../../contexts/auth-context";
 
 const RankingsPage = () => {
   const [characters, setCharacters] = useState([]);
