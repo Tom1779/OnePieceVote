@@ -1,4 +1,5 @@
 import "./globals.css";
+import { AuthProvider } from "../contexts/auth-context";
 
 export const metadata = {
   title: "One Piece Character Voting",
@@ -7,8 +8,10 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html>
+      <body>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }
