@@ -235,14 +235,16 @@ export default function Page() {
                       #{index + 1}
                     </div>
                     <div className="relative">
-                      <Image
-                        src={character.image_url}
-                        alt={character.name}
-                        style={{ objectFit: "cover" }}
-                        width={700}
-                        height={700}
-                        className="w-14 h-14 rounded-full object-cover border-2 border-gray-700"
-                      />
+                      <div onClick={() => openModal(character.image_url)}>
+                        <Image
+                          src={character.image_url}
+                          alt={character.name}
+                          style={{ objectFit: "cover" }}
+                          width={700}
+                          height={700}
+                          className="w-14 h-14 rounded-full object-cover border-2 border-gray-700"
+                        />
+                      </div>
                       {index < 3 && (
                         <div className="absolute -top-2 -right-2">
                           <Star
