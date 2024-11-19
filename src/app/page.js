@@ -26,6 +26,8 @@ export default function Page() {
     error: topError,
   } = useTopCharacters();
 
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
   const handleVote = useCallback(
     (characterId) => {
       if (!user) {
