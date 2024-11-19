@@ -8,7 +8,6 @@ export function useCharacterSearch(searchQuery) {
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  console.log(user);
 
   useEffect(() => {
     if (!user) {

@@ -1,4 +1,6 @@
 // src/contexts/auth-context.js
+"use client";
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
