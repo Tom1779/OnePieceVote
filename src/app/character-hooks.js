@@ -73,7 +73,11 @@ export function useTopCharacters() {
 }
 
 export async function voteForCharacter(characterId) {
-  const { user } = supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user;
+
   if (!user) {
     return { success: false, error: "Must be logged in to vote" };
   }

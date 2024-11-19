@@ -30,6 +30,7 @@ export default function Page() {
 
   const handleVote = useCallback(
     (characterId) => {
+      console.log("Current user in handleVote:", user);
       if (!user) {
         alert("Please sign in to vote!");
         return;
