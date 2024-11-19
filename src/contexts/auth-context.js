@@ -1,4 +1,3 @@
-// src/contexts/auth-context.js
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
@@ -23,6 +22,12 @@ export function AuthProvider({ children }) {
       const {
         data: { session },
       } = await supabase.auth.getSession();
+
+      console.log("Initial Session Check:", {
+        session: !!session,
+        user: session?.user ? session.user.email : null,
+      });
+
       setUser(session?.user ?? null);
       setLoading(false);
     };
@@ -33,6 +38,12 @@ export function AuthProvider({ children }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Auth State Change:", {
+        event: _event,
+        session: !!session,
+        user: session?.user ? session.user.email : null,
+      });
+
       setUser(session?.user ?? null);
       if (session?.user) {
         router.refresh(); // Refresh the page to update data

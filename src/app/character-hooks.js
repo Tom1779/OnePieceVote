@@ -1,4 +1,3 @@
-// src/app/character-hooks.js
 import { useState, useEffect } from "react";
 import { supabase } from "../contexts/auth-context";
 import { useAuth } from "../contexts/auth-context";
@@ -73,8 +72,13 @@ export function useTopCharacters() {
 }
 
 export async function voteForCharacter(characterId) {
-  const { user } = supabase.auth.getSession();
-  if (!user) {
+  // Explicitly get the current session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session || !session.user) {
+    console.error("No active session found");
     return { success: false, error: "Must be logged in to vote" };
   }
 
