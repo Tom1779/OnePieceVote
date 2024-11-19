@@ -145,7 +145,7 @@ export default function Page() {
                         width={700}
                         height={700}
                         style={{ objectFit: "contain" }}
-                        className="w-14 h-14 rounded-full object-cover border-2 border-gray-700"
+                        className="w-20 h-20 rounded-full object-cover border-2 border-gray-700"
                       />
                       <div className="flex-1">
                         <div className="font-semibold text-lg text-gray-200">
