@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useTransition } from "react";
 import { Search, Trophy, List, Star, LogIn, LogOut } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -13,6 +13,7 @@ import { useAuth } from "../contexts/auth-context";
 
 export default function Page() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isPending, startTransition] = useTransition();
   const { user, signIn, signOut } = useAuth();
   const {
     characters,
@@ -25,23 +26,33 @@ export default function Page() {
     error: topError,
   } = useTopCharacters();
 
-  const handleVote = async (characterId) => {
-    if (!user) {
-      alert("Please sign in to vote!");
-      return;
-    }
+  const handleVote = useCallback(
+    (characterId) => {
+      if (!user) {
+        alert("Please sign in to vote!");
+        return;
+      }
 
-    const result = await voteForCharacter(characterId);
-    if (result.success) {
-      window.location.reload();
-    } else {
-      alert(result.error || "Failed to vote. Please try again.");
-    }
-  };
+      startTransition(async () => {
+        try {
+          const result = await voteForCharacter(characterId);
+          if (result.success) {
+            window.location.reload();
+          } else {
+            alert(result.error || "Failed to vote. Please try again.");
+          }
+        } catch (error) {
+          console.error("Voting error:", error);
+          alert("An unexpected error occurred. Please try again.");
+        }
+      });
+    },
+    [user]
+  );
 
   return (
     <div className="min-h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Enhanced Navigation Bar */}
+      {/* Navigation Bar */}
       <nav className="bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
@@ -147,10 +158,10 @@ export default function Page() {
                           user
                             ? "bg-blue-600 hover:bg-blue-700"
                             : "bg-blue-600/50 cursor-not-allowed"
-                        }`}
-                        disabled={!user}
+                        } ${isPending ? "opacity-50 cursor-wait" : ""}`}
+                        disabled={!user || isPending}
                       >
-                        Vote
+                        {isPending ? "Voting..." : "Vote"}
                       </button>
                     </div>
                   ))}
