@@ -100,6 +100,7 @@ export default function Page() {
                         alt={character.name}
                         width={500}
                         height={500}
+                        style={{ objectFit: "contain" }}
                         className="w-14 h-14 rounded-full object-cover border-2 border-gray-700"
                       />
                       <div className="flex-1">
@@ -170,9 +171,12 @@ export default function Page() {
                       #{index + 1}
                     </div>
                     <div className="relative">
-                      <img
-                        src={character.image_url || "/api/placeholder/100/100"}
+                      <Image
+                        src={character.image_url}
                         alt={character.name}
+                        style={{ objectFit: "cover" }}
+                        width={500}
+                        height={500}
                         className="w-14 h-14 rounded-full object-cover border-2 border-gray-700"
                       />
                       {index < 3 && (

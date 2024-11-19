@@ -4,17 +4,11 @@ import { supabase } from "../contexts/auth-context";
 import { useAuth } from "../contexts/auth-context";
 
 export function useCharacterSearch(searchQuery) {
-  const { user } = useAuth();
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!user) {
-      setCharacters([]);
-      return;
-    }
-
     const fetchCharacters = async () => {
       try {
         setLoading(true);
@@ -40,23 +34,17 @@ export function useCharacterSearch(searchQuery) {
 
     const timeoutId = setTimeout(fetchCharacters, 300);
     return () => clearTimeout(timeoutId);
-  }, [searchQuery, user]);
+  }, [searchQuery]);
 
   return { characters, loading, error };
 }
 
 export function useTopCharacters() {
-  const { user } = useAuth();
   const [topCharacters, setTopCharacters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!user) {
-      setTopCharacters([]);
-      return;
-    }
-
     const fetchTopCharacters = async () => {
       try {
         setLoading(true);
@@ -79,7 +67,7 @@ export function useTopCharacters() {
     };
 
     fetchTopCharacters();
-  }, [user]);
+  }, []);
 
   return { topCharacters, loading, error };
 }
