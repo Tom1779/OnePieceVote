@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useTransition } from "react";
 import { Search, Trophy, List, Star, LogIn, LogOut } from "lucide-react";
+import ImageModal from "./components/ImageModal";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -13,6 +14,7 @@ import { useAuth } from "../contexts/auth-context";
 
 export default function Page() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
   const [isPending, startTransition] = useTransition();
   const { user, signIn, signOut } = useAuth();
   const {
@@ -25,6 +27,14 @@ export default function Page() {
     loading: topLoading,
     error: topError,
   } = useTopCharacters();
+
+  const openModal = (image) => {
+    setSelectedImage(image);
+  };
+
+  const closeModal = () => {
+    setSelectedImage(null);
+  };
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -139,14 +149,16 @@ export default function Page() {
                       key={character.id}
                       className="flex items-center gap-4 p-4 bg-gray-900/50 rounded-xl border border-gray-700 hover:border-gray-600 transition-all duration-300"
                     >
-                      <Image
-                        src={character.image_url}
-                        alt={character.name}
-                        width={700}
-                        height={700}
-                        style={{ objectFit: "contain" }}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-gray-700"
-                      />
+                      <div onClick={() => openModal(character.image_url)}>
+                        <Image
+                          src={character.image_url}
+                          alt={character.name}
+                          width={700}
+                          height={700}
+                          style={{ objectFit: "contain" }}
+                          className="w-16 h-16 rounded-full object-cover border-2 border-gray-700"
+                        />
+                      </div>
                       <div className="flex-1">
                         <div className="font-semibold text-lg text-gray-200">
                           {character.name}
@@ -260,6 +272,13 @@ export default function Page() {
           </div>
         </div>
       </main>
+      {selectedImage && (
+        <ImageModal
+          src={selectedImage}
+          alt="Character Image"
+          onClose={closeModal}
+        />
+      )}
     </div>
   );
 }
