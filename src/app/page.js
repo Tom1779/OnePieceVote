@@ -239,10 +239,10 @@ export default function Page() {
                         <Image
                           src={character.image_url}
                           alt={character.name}
-                          style={{ objectFit: "cover" }}
+                          style={{ objectFit: "contain" }}
                           width={700}
                           height={700}
-                          className="w-14 h-14 rounded-full object-cover border-2 border-gray-700"
+                          className="w-16 h-16 rounded-full object-cover border-2 border-gray-700"
                         />
                       </div>
                       {index < 3 && (
