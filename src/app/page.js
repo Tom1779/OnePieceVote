@@ -1,7 +1,15 @@
 "use client";
 
 import { useState, useCallback, useTransition } from "react";
-import { Search, Trophy, List, Star, LogIn, LogOut } from "lucide-react";
+import {
+  Search,
+  Trophy,
+  List,
+  Star,
+  Trophy,
+  LogIn,
+  LogOut,
+} from "lucide-react";
 import ImageModal from "./components/ImageModal";
 import Link from "next/link";
 import Image from "next/image";
@@ -247,7 +255,7 @@ export default function Page() {
                       </div>
                       {index < 3 && (
                         <div className="absolute -top-2 -right-2">
-                          <Star
+                          <Trophy
                             className={`h-6 w-6 ${
                               index === 0
                                 ? "text-yellow-500"
