@@ -153,7 +153,10 @@ export default function Page() {
                         </div>
                       </div>
                       <button
-                        onClick={() => handleVote(character.id)}
+                        onClick={async () => {
+                          await sleep(100);
+                          () => handleVote(character.id);
+                        }}
                         className={`px-4 py-2 rounded-lg text-white font-medium transition-colors ${
                           user
                             ? "bg-blue-600 hover:bg-blue-700"
