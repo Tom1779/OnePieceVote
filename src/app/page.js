@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Trophy, List, Star } from "lucide-react";
+import { Search, Trophy, List, Star, LogIn, LogOut } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -9,9 +9,11 @@ import {
   useTopCharacters,
   voteForCharacter,
 } from "./character-hooks";
+import { useAuth } from "../contexts/auth-context";
 
 export default function Page() {
   const [searchQuery, setSearchQuery] = useState("");
+  const { user, signIn, signOut } = useAuth();
   const {
     characters,
     loading: searchLoading,
@@ -24,12 +26,16 @@ export default function Page() {
   } = useTopCharacters();
 
   const handleVote = async (characterId) => {
+    if (!user) {
+      alert("Please sign in to vote!");
+      return;
+    }
+
     const result = await voteForCharacter(characterId);
     if (result.success) {
-      // Optionally refresh the data
       window.location.reload();
     } else {
-      alert("Failed to vote. Please try again.");
+      alert(result.error || "Failed to vote. Please try again.");
     }
   };
 
@@ -45,13 +51,32 @@ export default function Page() {
                 One Piece Character Voting
               </div>
             </div>
-            <Link
-              href="/rankings"
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-800/50 text-blue-400 hover:bg-gray-700 transition-all duration-300 ease-in-out transform hover:scale-105"
-            >
-              <List size={18} />
-              <span className="font-medium">Overall Rankings</span>
-            </Link>
+            <div className="flex items-center space-x-4">
+              <Link
+                href="/rankings"
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-800/50 text-blue-400 hover:bg-gray-700 transition-all duration-300 ease-in-out transform hover:scale-105"
+              >
+                <List size={18} />
+                <span className="font-medium">Overall Rankings</span>
+              </Link>
+              {user ? (
+                <button
+                  onClick={signOut}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-800/50 text-red-400 hover:bg-red-700 transition-all duration-300 ease-in-out transform hover:scale-105"
+                >
+                  <LogOut size={18} />
+                  <span className="font-medium">Sign Out</span>
+                </button>
+              ) : (
+                <button
+                  onClick={signIn}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-800/50 text-blue-400 hover:bg-blue-700 transition-all duration-300 ease-in-out transform hover:scale-105"
+                >
+                  <LogIn size={18} />
+                  <span className="font-medium">Sign In</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </nav>
@@ -78,6 +103,11 @@ export default function Page() {
                   size={20}
                 />
               </div>
+              {!user && (
+                <div className="text-center text-yellow-400 mb-4">
+                  Please sign in to vote for characters!
+                </div>
+              )}
             </div>
 
             {/* Search Results */}
@@ -113,7 +143,12 @@ export default function Page() {
                       </div>
                       <button
                         onClick={() => handleVote(character.id)}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition-colors"
+                        className={`px-4 py-2 rounded-lg text-white font-medium transition-colors ${
+                          user
+                            ? "bg-blue-600 hover:bg-blue-700"
+                            : "bg-blue-600/50 cursor-not-allowed"
+                        }`}
+                        disabled={!user}
                       >
                         Vote
                       </button>
