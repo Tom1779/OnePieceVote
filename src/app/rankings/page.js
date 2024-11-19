@@ -102,6 +102,7 @@ const RankingsPage = () => {
                     alt={character.name}
                     width={500}
                     height={500}
+                    style={{ objectFit: "contain" }}
                     className="w-12 h-12 rounded-full object-cover border-2 border-gray-700"
                   />
                   <div className="font-medium text-gray-200">
