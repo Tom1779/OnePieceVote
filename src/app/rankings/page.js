@@ -100,8 +100,8 @@ const RankingsPage = () => {
                   <Image
                     src={character.image_url}
                     alt={character.name}
-                    width={500}
-                    height={500}
+                    width={700}
+                    height={700}
                     style={{ objectFit: "contain" }}
                     className="w-12 h-12 rounded-full object-cover border-2 border-gray-700"
                   />
