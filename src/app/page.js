@@ -142,8 +142,8 @@ export default function Page() {
                       <Image
                         src={character.image_url}
                         alt={character.name}
-                        width={500}
-                        height={500}
+                        width={700}
+                        height={700}
                         style={{ objectFit: "contain" }}
                         className="w-14 h-14 rounded-full object-cover border-2 border-gray-700"
                       />
@@ -227,8 +227,8 @@ export default function Page() {
                         src={character.image_url}
                         alt={character.name}
                         style={{ objectFit: "cover" }}
-                        width={500}
-                        height={500}
+                        width={700}
+                        height={700}
                         className="w-14 h-14 rounded-full object-cover border-2 border-gray-700"
                       />
                       {index < 3 && (
