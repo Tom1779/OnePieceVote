@@ -1,31 +1,33 @@
 import Image from "next/image";
+import { X } from "lucide-react";
 
 export default function ImageModal({ src, alt, onClose }) {
   const handleBackdropClick = (e) => {
-    // Close the modal only if the backdrop is clicked
     if (e.target === e.currentTarget) {
       onClose();
     }
   };
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
-      onClick={handleBackdropClick} // Handle clicks on the backdrop
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4"
+      onClick={handleBackdropClick}
     >
-      <div className="relative">
+      <div className="relative max-w-[90vw] max-h-[90vh] bg-gray-900 rounded-xl">
         <Image
           src={src}
           alt={alt}
           width={700}
           height={700}
           style={{ objectFit: "contain" }}
-          className="rounded-lg"
+          className="rounded-xl max-h-[90vh] w-auto"
         />
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-white text-lg bg-black bg-opacity-50 rounded-full px-4 py-2 hover:bg-opacity-75 transition-all"
+          className="absolute top-2 right-2 p-2 bg-black/50 hover:bg-black/75 rounded-full transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/50"
+          aria-label="Close image"
         >
-          Close
+          <X className="w-6 h-6 text-white" />
         </button>
       </div>
     </div>
