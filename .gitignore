@@ -30,4 +30,4 @@ yarn-error.log*
 .env.production.local
 
 #update script
-update-table.py
+/update-table.py
