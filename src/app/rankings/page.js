@@ -119,7 +119,7 @@ const RankingsPage = () => {
                       className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
                     />
                   </div>
-                  <div className="font-medium text-sm sm:text-base text-gray-200 truncate">
+                  <div className="font-medium text-sm sm:text-base text-gray-200 break-words min-w-0">
                     {character.name}
                   </div>
                 </div>

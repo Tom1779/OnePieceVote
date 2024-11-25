@@ -208,9 +208,7 @@ export default function Page() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        {" "}
-                        {/* Added min-w-0 to enable truncation */}
-                        <div className="font-semibold text-base sm:text-lg text-gray-200 truncate">
+                        <div className="font-semibold text-base sm:text-lg text-gray-200 break-words">
                           {character.name}
                         </div>
                         <div className="text-xs sm:text-sm text-gray-400">
@@ -303,7 +301,7 @@ export default function Page() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-base sm:text-lg text-gray-200 truncate">
+                    <div className="font-semibold text-base sm:text-lg text-gray-200 break-words">
                       {character.name}
                     </div>
                     <div className="text-xs sm:text-sm text-blue-400 font-medium">
