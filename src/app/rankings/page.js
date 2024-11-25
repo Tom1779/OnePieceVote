@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "../../contexts/auth-context";
-import ImageModal from "./components/ImageModal";
+import ImageModal from "../components/ImageModal";
 
 const RankingsPage = () => {
   const [characters, setCharacters] = useState([]);
