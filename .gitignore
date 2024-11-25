@@ -30,7 +30,8 @@ yarn-error.log*
 .env.production.local
 
 #update script
+/get_characters.py
 /update-table.py
 
 #dataset
-/one_piece_characters1.json
+/one_piece_characters.json
