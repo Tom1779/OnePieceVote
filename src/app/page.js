@@ -203,19 +203,17 @@ export default function Page() {
                         onClick={() => openModal(character.image_url)}
                         className="flex-shrink-0"
                       >
-                        <Image
+                        <img
                           src={proxyImageUrl(character.image_url)}
                           alt={character.name}
-                          width={700}
-                          height={700}
                           onError={(e) => {
                             console.error(
-                              "Image load error:",
+                              "Image load error for URL:",
                               character.image_url
                             );
                             e.target.onerror = null; // Prevent infinite error loop
+                            e.target.src = "/path/to/fallback/image.jpg"; // Optional fallback image
                           }}
-                          style={{ objectFit: "contain" }}
                           className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
                         />
                       </div>
@@ -289,19 +287,17 @@ export default function Page() {
                   </div>
                   <div className="relative">
                     <div onClick={() => openModal(character.image_url)}>
-                      <Image
+                      <img
                         src={proxyImageUrl(character.image_url)}
                         alt={character.name}
-                        style={{ objectFit: "contain" }}
                         onError={(e) => {
                           console.error(
-                            "Image load error:",
+                            "Image load error for URL:",
                             character.image_url
                           );
                           e.target.onerror = null; // Prevent infinite error loop
+                          e.target.src = "/path/to/fallback/image.jpg"; // Optional fallback image
                         }}
-                        width={700}
-                        height={700}
                         className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
                       />
                     </div>
