@@ -69,6 +69,10 @@ export function AuthProvider({ children }) {
       sessionStorage.removeItem("supabase.auth.token");
       sessionStorage.removeItem("supabase.auth.session");
 
+      // Clear user state in AuthContext
+      setUser(null);
+      setLoading(true);
+
       // Manually clear cookies (if needed)
       document.cookie = "supabase.auth.token=; Max-Age=0; path=/"; // Clear token cookie
       document.cookie = "supabase.auth.session=; Max-Age=0; path=/"; // Clear session cookie
