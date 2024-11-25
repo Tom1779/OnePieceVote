@@ -11,5 +11,10 @@ export async function GET(request) {
     await supabase.auth.exchangeCodeForSession(code);
   }
 
+  // Clear cookies after successful login or sign-out
+  cookies().delete("sb-access-token"); // Remove the access token cookie
+  cookies().delete("sb-refresh-token"); // Remove the refresh token cookie
+  cookies().delete("supabase.auth.token"); // In case there's any other token stored
+
   return NextResponse.redirect(requestUrl.origin);
 }
