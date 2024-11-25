@@ -199,7 +199,7 @@ export default function Page() {
                         className="flex-shrink-0"
                       >
                         <Image
-                          src={character.image_url}
+                          src={"/api/image?url=" + character.image_url}
                           alt={character.name}
                           width={700}
                           height={700}
@@ -278,7 +278,7 @@ export default function Page() {
                   <div className="relative">
                     <div onClick={() => openModal(character.image_url)}>
                       <Image
-                        src={character.image_url}
+                        src={"/api/image?url=" + character.image_url}
                         alt={character.name}
                         style={{ objectFit: "contain" }}
                         width={700}
