@@ -62,6 +62,9 @@ export function AuthProvider({ children }) {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
+      // Optionally reset session on Supabase client, just in case
+      await supabase.auth.setSession(null);
+
       router.refresh();
     } catch (error) {
       console.error("Error signing out:", error);
