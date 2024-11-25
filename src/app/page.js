@@ -79,6 +79,7 @@ export default function Page() {
   );
 
   function proxyImageUrl(originalUrl) {
+    console.log("Proxying image URL:", originalUrl);
     return `/api/image-proxy?url=${encodeURIComponent(originalUrl)}`;
   }
 
