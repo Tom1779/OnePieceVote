@@ -5,11 +5,21 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "../../contexts/auth-context";
+import ImageModal from "./components/ImageModal";
 
 const RankingsPage = () => {
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const openModal = (image) => {
+    setSelectedImage(image);
+  };
+
+  const closeModal = () => {
+    setSelectedImage(null);
+  };
 
   useEffect(() => {
     const fetchCharacters = async () => {
@@ -96,14 +106,19 @@ const RankingsPage = () => {
                   #{index + 1}
                 </div>
                 <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-                  <Image
-                    src={character.image_url}
-                    alt={character.name}
-                    width={700}
-                    height={700}
-                    style={{ objectFit: "contain" }}
-                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-gray-700"
-                  />
+                  <div
+                    onClick={() => openModal(character.image_url)}
+                    className="flex-shrink-0"
+                  >
+                    <Image
+                      src={character.image_url}
+                      alt={character.name}
+                      width={700}
+                      height={700}
+                      style={{ objectFit: "contain" }}
+                      className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
+                    />
+                  </div>
                   <div className="font-medium text-sm sm:text-base text-gray-200 truncate">
                     {character.name}
                   </div>
@@ -116,6 +131,13 @@ const RankingsPage = () => {
           </div>
         </div>
       </main>
+      {selectedImage && (
+        <ImageModal
+          src={selectedImage}
+          alt="Character Image"
+          onClose={closeModal}
+        />
+      )}
     </div>
   );
 };
