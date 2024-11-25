@@ -207,6 +207,13 @@ export default function Page() {
                           alt={character.name}
                           width={700}
                           height={700}
+                          onError={(e) => {
+                            console.error(
+                              "Image load error:",
+                              character.image_url
+                            );
+                            e.target.onerror = null; // Prevent infinite error loop
+                          }}
                           style={{ objectFit: "contain" }}
                           className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
                         />
@@ -285,6 +292,13 @@ export default function Page() {
                         src={proxyImageUrl(character.image_url)}
                         alt={character.name}
                         style={{ objectFit: "contain" }}
+                        onError={(e) => {
+                          console.error(
+                            "Image load error:",
+                            character.image_url
+                          );
+                          e.target.onerror = null; // Prevent infinite error loop
+                        }}
                         width={700}
                         height={700}
                         className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
