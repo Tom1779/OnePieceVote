@@ -48,7 +48,6 @@ export function AuthProvider({ children }) {
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
-          prompt: "select_account",
         },
       });
       if (error) throw error;
