@@ -80,51 +80,18 @@ export default function Page() {
 
   function proxyImageUrl(originalUrl) {
     try {
-      const urlParts = new URL(originalUrl);
-
-      // Special handling for wikia.nocookie.net URLs
-      if (
-        urlParts.hostname.includes("wikia.nocookie.net") ||
-        urlParts.hostname.includes("static.wikia.nocookie.net")
-      ) {
-        // Attempt to reconstruct the URL more precisely
-        const pathSegments = urlParts.pathname.split("/");
-
-        // Find the index of 'images' to preserve the full image path
-        const imagesIndex = pathSegments.indexOf("images");
-
-        if (imagesIndex !== -1) {
-          // Reconstruct the URL up to the image filename
-          const imagePathSegments = pathSegments.slice(0, imagesIndex + 3);
-          const cleanPath = imagePathSegments.join("/");
-
-          const cleanUrl = `${urlParts.protocol}//${urlParts.hostname}${cleanPath}`;
-          const proxiedUrl = `/api/image-proxy?url=${encodeURIComponent(
-            originalUrl
-          )}`;
-
-          console.log("Original URL:", originalUrl);
-          console.log("Cleaned URL:", cleanUrl);
-          console.log("Proxied URL:", proxiedUrl);
-
-          return proxiedUrl;
-        }
-      }
-
-      // Fallback to original method for other URLs
-      const cleanUrl = `${urlParts.protocol}//${urlParts.hostname}${urlParts.pathname}`;
+      // Simply pass the original URL through the proxy
       const proxiedUrl = `/api/image-proxy?url=${encodeURIComponent(
         originalUrl
       )}`;
 
       console.log("Original URL:", originalUrl);
-      console.log("Cleaned URL:", cleanUrl);
       console.log("Proxied URL:", proxiedUrl);
 
       return proxiedUrl;
     } catch (error) {
       console.error("Error processing image URL:", error);
-      return `/api/image-proxy?url=${encodeURIComponent(originalUrl)}`;
+      return originalUrl; // Fallback to original URL if something goes wrong
     }
   }
 
