@@ -48,7 +48,6 @@ export function AuthProvider({ children }) {
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
-          prompt: "select_account",
         },
       });
       if (error) throw error;
@@ -63,22 +62,7 @@ export function AuthProvider({ children }) {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
-      // Clear session data on client
-      localStorage.removeItem("supabase.auth.token");
-      localStorage.removeItem("supabase.auth.session");
-      sessionStorage.removeItem("supabase.auth.token");
-      sessionStorage.removeItem("supabase.auth.session");
-
-      // Clear user state in AuthContext
-      setUser(null);
-      setLoading(true);
-
-      // Manually clear cookies (if needed)
-      document.cookie = "supabase.auth.token=; Max-Age=0; path=/"; // Clear token cookie
-      document.cookie = "supabase.auth.session=; Max-Age=0; path=/"; // Clear session cookie
-
-      // Optionally, redirect or refresh the page
-      router.push("/"); // Redirect to login page or home
+      router.refresh();
     } catch (error) {
       console.error("Error signing out:", error);
       throw error;
