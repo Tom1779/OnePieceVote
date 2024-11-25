@@ -62,7 +62,18 @@ export function AuthProvider({ children }) {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
-      router.refresh();
+      // Clear session data on client
+      localStorage.removeItem("supabase.auth.token");
+      localStorage.removeItem("supabase.auth.session");
+      sessionStorage.removeItem("supabase.auth.token");
+      sessionStorage.removeItem("supabase.auth.session");
+
+      // Manually clear cookies (if needed)
+      document.cookie = "supabase.auth.token=; Max-Age=0; path=/"; // Clear token cookie
+      document.cookie = "supabase.auth.session=; Max-Age=0; path=/"; // Clear session cookie
+
+      // Optionally, redirect or refresh the page
+      router.push("/"); // Redirect to login page or home
     } catch (error) {
       console.error("Error signing out:", error);
       throw error;
