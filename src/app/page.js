@@ -18,18 +18,26 @@ export default function Page() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isPending, startTransition] = useTransition();
   const { user, signIn, signOut } = useAuth();
+
   const {
     characters,
     loading: searchLoading,
     error: searchError,
+    updateLocalVote,
   } = useCharacterSearch(searchQuery);
+
   const {
     topCharacters,
     loading: topLoading,
     error: topError,
+    fetchTopCharacters,
   } = useTopCharacters();
 
-  const { votesRemaining, loading: votesLoading } = useVotesRemaining();
+  const {
+    votesRemaining,
+    loading: votesLoading,
+    updateLocalVotesRemaining,
+  } = useVotesRemaining();
 
   const openModal = (image) => {
     setSelectedImage(image);
@@ -42,7 +50,7 @@ export default function Page() {
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const handleVote = useCallback(
-    (characterId) => {
+    async (characterId) => {
       console.log("Current user in handleVote:", user);
       if (!user) {
         alert("Please sign in to vote!");
@@ -53,7 +61,11 @@ export default function Page() {
         try {
           const result = await voteForCharacter(characterId);
           if (result.success) {
-            window.location.reload();
+            // Update local state instead of reloading
+            updateLocalVote(characterId);
+            updateLocalVotesRemaining();
+            // Refresh top characters list
+            await fetchTopCharacters();
           } else {
             alert(result.error || "Failed to vote. Please try again.");
           }
@@ -63,7 +75,7 @@ export default function Page() {
         }
       });
     },
-    [user]
+    [user, updateLocalVote, updateLocalVotesRemaining, fetchTopCharacters]
   );
 
   return (

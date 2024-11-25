@@ -1,5 +1,4 @@
-// src/app/character-hooks.js
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../contexts/auth-context";
 import { useAuth } from "../contexts/auth-context";
 
@@ -36,7 +35,17 @@ export function useCharacterSearch(searchQuery) {
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
 
-  return { characters, loading, error };
+  const updateLocalVote = useCallback((characterId) => {
+    setCharacters((prev) =>
+      prev.map((char) =>
+        char.id === characterId
+          ? { ...char, votes: (char.votes || 0) + 1 }
+          : char
+      )
+    );
+  }, []);
+
+  return { characters, loading, error, updateLocalVote };
 }
 
 export function useTopCharacters() {
@@ -44,32 +53,42 @@ export function useTopCharacters() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchTopCharacters = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  const fetchTopCharacters = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        const { data, error: queryError } = await supabase
-          .from("one_piece_characters")
-          .select("*")
-          .order("votes", { ascending: false })
-          .limit(10);
+      const { data, error: queryError } = await supabase
+        .from("one_piece_characters")
+        .select("*")
+        .order("votes", { ascending: false })
+        .limit(10);
 
-        if (queryError) throw queryError;
-        setTopCharacters(data || []);
-      } catch (err) {
-        console.error("Error fetching top characters:", err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTopCharacters();
+      if (queryError) throw queryError;
+      setTopCharacters(data || []);
+    } catch (err) {
+      console.error("Error fetching top characters:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  return { topCharacters, loading, error };
+  useEffect(() => {
+    fetchTopCharacters();
+  }, [fetchTopCharacters]);
+
+  const updateLocalVote = useCallback((characterId) => {
+    setTopCharacters((prev) =>
+      prev.map((char) =>
+        char.id === characterId
+          ? { ...char, votes: (char.votes || 0) + 1 }
+          : char
+      )
+    );
+  }, []);
+
+  return { topCharacters, loading, error, updateLocalVote, fetchTopCharacters };
 }
 
 export function useVotesRemaining() {
@@ -77,37 +96,46 @@ export function useVotesRemaining() {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
-  useEffect(() => {
-    const fetchVotesRemaining = async () => {
-      if (!user) {
-        setVotesRemaining(0);
-        setLoading(false);
-        return;
-      }
+  const fetchVotesRemaining = useCallback(async () => {
+    if (!user) {
+      setVotesRemaining(0);
+      setLoading(false);
+      return;
+    }
 
-      try {
-        const { data, error } = await supabase
-          .from("user_daily_votes")
-          .select("vote_count")
-          .eq("user_id", user.id)
-          .eq("vote_date", new Date().toISOString().split("T")[0])
-          .single();
+    try {
+      const { data, error } = await supabase
+        .from("user_daily_votes")
+        .select("vote_count")
+        .eq("user_id", user.id)
+        .eq("vote_date", new Date().toISOString().split("T")[0])
+        .single();
 
-        if (error) throw error;
+      if (error) throw error;
 
-        setVotesRemaining(5 - (data?.vote_count || 0));
-      } catch (err) {
-        console.error("Error fetching votes remaining:", err);
-        setVotesRemaining(5); // Assume no votes if error
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchVotesRemaining();
+      setVotesRemaining(5 - (data?.vote_count || 0));
+    } catch (err) {
+      console.error("Error fetching votes remaining:", err);
+      setVotesRemaining(5); // Assume no votes if error
+    } finally {
+      setLoading(false);
+    }
   }, [user]);
 
-  return { votesRemaining, loading };
+  useEffect(() => {
+    fetchVotesRemaining();
+  }, [fetchVotesRemaining]);
+
+  const updateLocalVotesRemaining = useCallback(() => {
+    setVotesRemaining((prev) => Math.max(0, prev - 1));
+  }, []);
+
+  return {
+    votesRemaining,
+    loading,
+    fetchVotesRemaining,
+    updateLocalVotesRemaining,
+  };
 }
 
 export async function voteForCharacter(characterId) {
