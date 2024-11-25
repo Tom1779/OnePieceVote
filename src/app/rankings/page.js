@@ -25,13 +25,31 @@ const RankingsPage = () => {
     const fetchCharacters = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from("one_piece_characters")
-          .select("*")
-          .order("votes", { ascending: false });
+        let allCharacters = [];
+        let page = 0;
+        const pageSize = 1000; // Supabase default max limit
 
-        if (error) throw error;
-        setCharacters(data || []);
+        while (true) {
+          const { data, error } = await supabase
+            .from("one_piece_characters")
+            .select("*")
+            .order("votes", { ascending: false })
+            .range(page * pageSize, (page + 1) * pageSize - 1);
+
+          if (error) throw error;
+
+          // Break the loop if no more data
+          if (!data || data.length === 0) break;
+
+          allCharacters = [...allCharacters, ...data];
+
+          // If returned data is less than page size, we've reached the end
+          if (data.length < pageSize) break;
+
+          page++;
+        }
+
+        setCharacters(allCharacters);
       } catch (err) {
         console.error("Error fetching rankings:", err);
         setError(err.message);
