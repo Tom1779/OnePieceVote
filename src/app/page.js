@@ -80,11 +80,27 @@ export default function Page() {
 
   function proxyImageUrl(originalUrl) {
     try {
-      // Remove query parameters and clean up URL
-      const cleanUrl = originalUrl.split("?")[0];
+      // More aggressive URL cleaning for Wikia images
+      const urlParts = new URL(originalUrl);
+      const pathSegments = urlParts.pathname.split("/");
+
+      // Remove revision, scaling, and other unnecessary segments
+      const cleanPath = pathSegments
+        .filter(
+          (segment) =>
+            !segment.includes("revision") &&
+            !segment.includes("scale-to-width-down") &&
+            segment !== "latest"
+        )
+        .join("/");
+
+      const cleanUrl = `${urlParts.protocol}//${urlParts.hostname}${cleanPath}`;
       const proxiedUrl = `/api/image-proxy?url=${encodeURIComponent(cleanUrl)}`;
+
+      console.log("Original URL:", originalUrl);
       console.log("Cleaned Proxy URL:", proxiedUrl);
-      console.log("Cleaned Original URL:", cleanUrl);
+      console.log("Cleaned URL:", cleanUrl);
+
       return proxiedUrl;
     } catch (error) {
       console.error("Error processing image URL:", error);

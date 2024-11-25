@@ -1,14 +1,13 @@
 import axios from "axios";
-import { URL } from "url";
 
 export default async function handler(req, res) {
-  // Enhanced CORS handling
+  // CORS and preflight handling (same as previous version)
   const origin = req.headers.origin || "*";
   res.setHeader("Access-Control-Allow-Origin", origin);
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, HEAD, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "*");
+  res.setHeader("Access-Control-Max-Age", "86400");
 
-  // Preflight CORS handling
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
@@ -23,55 +22,57 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Validate URL
-    const parsedUrl = new URL(url);
+    // Special handling for Wikia URLs
+    const isWikiaUrl = url.includes("wikia.nocookie.net");
 
-    // Optional: Add domain whitelist
-    const allowedDomains = [
-      "static.wikia.nocookie.net",
-      "your-other-allowed-domain.com",
-    ];
-    if (!allowedDomains.some((domain) => parsedUrl.hostname.includes(domain))) {
-      return res.status(403).json({ error: "Domain not allowed" });
-    }
-
-    console.log("Attempting to fetch image from:", url);
-
-    const response = await axios({
+    const requestConfig = {
       method: "get",
       url,
       responseType: "arraybuffer",
-      timeout: 10000,
+      timeout: 15000,
+      validateStatus: function (status) {
+        return status >= 200 && status < 300;
+      },
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
         Accept: "image/*",
-        Referer: parsedUrl.origin,
-        // Add custom headers for specific domains if needed
-        ...(parsedUrl.hostname.includes("wikia.nocookie.net") && {
+        Referer: isWikiaUrl ? "https://onepiece.fandom.com/" : url,
+        ...(isWikiaUrl && {
+          Origin: "https://onepiece.fandom.com",
           "Sec-Fetch-Dest": "image",
           "Sec-Fetch-Mode": "no-cors",
+          "Sec-Fetch-Site": "cross-site",
         }),
       },
-    });
+    };
+
+    console.log("Request Config:", JSON.stringify(requestConfig, null, 2));
+
+    const response = await axios(requestConfig);
+
+    console.log("Response Status:", response.status);
+    console.log("Response Headers:", response.headers);
 
     const contentType = response.headers["content-type"];
-    console.log("Content Type:", contentType);
+    console.log("Received Content Type:", contentType);
 
     if (!contentType || !contentType.startsWith("image/")) {
       console.error("Not an image. Content Type:", contentType);
-      return res.status(400).json({ error: "Not an image", contentType });
+      return res.status(400).json({
+        error: "Not an image",
+        contentType,
+        headers: response.headers,
+      });
     }
 
-    // Cache control and other headers
     res.setHeader("Content-Type", contentType);
     res.setHeader("Cache-Control", "public, max-age=86400");
     res.setHeader("X-Content-Type-Options", "nosniff");
 
-    // Send the image data
     res.status(200).send(response.data);
   } catch (error) {
-    console.error("Full Image Proxy Error:", {
+    console.error("Proxy Error Details:", {
       message: error.message,
       name: error.name,
       code: error.code,
@@ -80,7 +81,6 @@ export default async function handler(req, res) {
       data: error.response?.data,
     });
 
-    // Comprehensive error handling
     if (error.response) {
       res.status(error.response.status).json({
         error: "Failed to fetch image",
