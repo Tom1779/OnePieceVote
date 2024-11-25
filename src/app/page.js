@@ -79,8 +79,17 @@ export default function Page() {
   );
 
   function proxyImageUrl(originalUrl) {
-    console.log("Proxying image URL:", originalUrl);
-    return `/api/image-proxy?url=${encodeURIComponent(originalUrl)}`;
+    try {
+      // Remove query parameters and clean up URL
+      const cleanUrl = originalUrl.split("?")[0];
+      const proxiedUrl = `/api/image-proxy?url=${encodeURIComponent(cleanUrl)}`;
+      console.log("Cleaned Proxy URL:", proxiedUrl);
+      console.log("Cleaned Original URL:", cleanUrl);
+      return proxiedUrl;
+    } catch (error) {
+      console.error("Error processing image URL:", error);
+      return originalUrl; // Fallback to original if processing fails
+    }
   }
 
   return (
