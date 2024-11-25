@@ -31,3 +31,6 @@ yarn-error.log*
 
 #update script
 /update-table.py
+
+#dataset
+/one_piece_characters1.json
