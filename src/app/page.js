@@ -80,17 +80,13 @@ export default function Page() {
 
   function proxyImageUrl(originalUrl) {
     try {
-      // More aggressive URL cleaning for Wikia images
       const urlParts = new URL(originalUrl);
       const pathSegments = urlParts.pathname.split("/");
 
-      // Remove revision, scaling, and other unnecessary segments
+      // Preserve the core image path while removing query parameters
       const cleanPath = pathSegments
         .filter(
-          (segment) =>
-            !segment.includes("revision") &&
-            !segment.includes("scale-to-width-down") &&
-            segment !== "latest"
+          (segment) => segment !== "" && !segment.includes("cb=") // Remove cache-busting parameter
         )
         .join("/");
 
