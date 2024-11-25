@@ -81,16 +81,23 @@ export default function Page() {
   function proxyImageUrl(originalUrl) {
     try {
       const urlParts = new URL(originalUrl);
-      const pathSegments = urlParts.pathname.split("/");
 
-      // Preserve the core image path while removing query parameters
-      const cleanPath = pathSegments
+      // More aggressive cleaning of URL
+      const cleanPath = urlParts.pathname
+        .split("/")
         .filter(
-          (segment) => segment !== "" && !segment.includes("cb=") // Remove cache-busting parameter
+          (segment) =>
+            segment !== "" &&
+            !segment.includes("cb=") &&
+            !segment.includes("revision") &&
+            !segment.includes("scale-to-width-down")
         )
         .join("/");
 
-      const cleanUrl = `${urlParts.protocol}//${urlParts.hostname}${cleanPath}`;
+      // Always use HTTPS and include the full original hostname
+      const cleanUrl = `https://${urlParts.hostname}/${cleanPath}`;
+
+      // Use full encodeURIComponent to handle complex URLs
       const proxiedUrl = `/api/image-proxy?url=${encodeURIComponent(cleanUrl)}`;
 
       console.log("Original URL:", originalUrl);
@@ -100,7 +107,8 @@ export default function Page() {
       return proxiedUrl;
     } catch (error) {
       console.error("Error processing image URL:", error);
-      return originalUrl; // Fallback to original if processing fails
+      // If all else fails, try the original URL through the proxy
+      return `/api/image-proxy?url=${encodeURIComponent(originalUrl)}`;
     }
   }
 
