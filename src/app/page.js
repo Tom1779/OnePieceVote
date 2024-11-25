@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useTransition } from "react";
 import { Search, List, Star, Trophy, LogIn, LogOut } from "lucide-react";
-import ImageModal from "./components/ImageModal";
+import ImageModal from "../components/ImageModal";
 import Link from "next/link";
 import Image from "next/image";
 import {
