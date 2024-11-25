@@ -82,32 +82,39 @@ export default function Page() {
     try {
       const urlParts = new URL(originalUrl);
 
-      // More aggressive cleaning of URL
-      const cleanPath = urlParts.pathname
-        .split("/")
-        .filter(
-          (segment) =>
-            segment !== "" &&
-            !segment.includes("cb=") &&
-            !segment.includes("revision") &&
-            !segment.includes("scale-to-width-down")
-        )
-        .join("/");
+      // More careful URL cleaning that preserves more of the original structure
+      const pathSegments = urlParts.pathname.split("/");
 
-      // Always use HTTPS and include the full original hostname
-      const cleanUrl = `https://${urlParts.hostname}/${cleanPath}`;
+      // Find the last meaningful path segment (typically the image filename)
+      const meaningfulSegments = pathSegments.filter(
+        (segment) =>
+          segment !== "" &&
+          !segment.includes("cb=") &&
+          !segment.includes("scale-to-width-down")
+      );
 
-      // Use full encodeURIComponent to handle complex URLs
+      // Reconstruct a clean URL that maintains the original image path
+      const cleanPath =
+        meaningfulSegments.length > 0
+          ? meaningfulSegments.join("/")
+          : urlParts.pathname;
+
+      // Construct the clean URL, preserving more of the original structure
+      const cleanUrl = `${urlParts.protocol}//${urlParts.hostname}${
+        cleanPath.startsWith("/") ? cleanPath : "/" + cleanPath
+      }`;
+
+      // Encode the entire URL for the proxy
       const proxiedUrl = `/api/image-proxy?url=${encodeURIComponent(cleanUrl)}`;
 
       console.log("Original URL:", originalUrl);
-      console.log("Cleaned Proxy URL:", proxiedUrl);
       console.log("Cleaned URL:", cleanUrl);
+      console.log("Proxied URL:", proxiedUrl);
 
       return proxiedUrl;
     } catch (error) {
       console.error("Error processing image URL:", error);
-      // If all else fails, try the original URL through the proxy
+      // Fallback to direct proxy of original URL
       return `/api/image-proxy?url=${encodeURIComponent(originalUrl)}`;
     }
   }

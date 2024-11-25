@@ -21,14 +21,15 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "No URL provided" });
   }
 
-  try {
-    // Try multiple URL variations
-    const urlVariations = [
-      url, // Original URL
-      url.replace(/\/revision\/latest\/scale-to-width-down\/\d+/, ""), // Remove scaling
-      url.split("?")[0], // Remove query parameters
-    ];
+  // More aggressive URL variations
+  const urlVariations = [
+    url, // Original URL
+    url.replace(/\/revision\/latest\/scale-to-width-down\/\d+/, ""), // Remove scaling
+    url.split("?")[0], // Remove query parameters
+    url.replace(/\/revision\/.*/, ""), // Remove entire revision path
+  ];
 
+  try {
     let successfulResponse = null;
 
     for (const tryUrl of urlVariations) {
@@ -47,16 +48,24 @@ export default async function handler(req, res) {
             "User-Agent":
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
             Accept: "image/*",
-            Referer: "https://onepiece.fandom.com/",
-            Origin: "https://onepiece.fandom.com",
+            Referer: new URL(tryUrl).hostname,
+            Origin: new URL(tryUrl).hostname,
           },
         });
 
-        // Check if it's a valid image
-        const contentType = response.headers["content-type"];
-        if (contentType && contentType.startsWith("image/")) {
+        // More robust content type checking
+        const contentType = response.headers["content-type"]?.toLowerCase();
+        if (
+          contentType &&
+          (contentType.startsWith("image/") ||
+            contentType.includes("image") ||
+            contentType === "application/octet-stream")
+        ) {
           successfulResponse = response;
+          console.log("Successfully fetched image from:", tryUrl);
           break;
+        } else {
+          console.log("Failed content type check:", contentType);
         }
       } catch (attemptError) {
         console.log(`Attempt with URL ${tryUrl} failed:`, attemptError.message);
@@ -68,7 +77,8 @@ export default async function handler(req, res) {
       throw new Error("Could not fetch image from any variation of the URL");
     }
 
-    const contentType = successfulResponse.headers["content-type"];
+    const contentType =
+      successfulResponse.headers["content-type"] || "image/jpeg";
     console.log("Received Content Type:", contentType);
 
     res.setHeader("Content-Type", contentType);
