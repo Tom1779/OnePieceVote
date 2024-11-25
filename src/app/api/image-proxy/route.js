@@ -1,12 +1,14 @@
 import axios from "axios";
+import { URL } from "url";
 
 export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  // Enhanced CORS handling
+  const origin = req.headers.origin || "*";
+  res.setHeader("Access-Control-Allow-Origin", origin);
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-  // Handle OPTIONS request
+  // Preflight CORS handling
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
@@ -21,18 +23,35 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Validate URL
+    const parsedUrl = new URL(url);
+
+    // Optional: Add domain whitelist
+    const allowedDomains = [
+      "static.wikia.nocookie.net",
+      "your-other-allowed-domain.com",
+    ];
+    if (!allowedDomains.some((domain) => parsedUrl.hostname.includes(domain))) {
+      return res.status(403).json({ error: "Domain not allowed" });
+    }
+
     console.log("Attempting to fetch image from:", url);
 
     const response = await axios({
       method: "get",
       url,
-      responseType: "arraybuffer", // Changed from stream to arraybuffer
+      responseType: "arraybuffer",
       timeout: 10000,
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
         Accept: "image/*",
-        Referer: url,
+        Referer: parsedUrl.origin,
+        // Add custom headers for specific domains if needed
+        ...(parsedUrl.hostname.includes("wikia.nocookie.net") && {
+          "Sec-Fetch-Dest": "image",
+          "Sec-Fetch-Mode": "no-cors",
+        }),
       },
     });
 
@@ -44,10 +63,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Not an image", contentType });
     }
 
+    // Cache control and other headers
     res.setHeader("Content-Type", contentType);
     res.setHeader("Cache-Control", "public, max-age=86400");
+    res.setHeader("X-Content-Type-Options", "nosniff");
 
-    // Send the image data directly
+    // Send the image data
     res.status(200).send(response.data);
   } catch (error) {
     console.error("Full Image Proxy Error:", {
@@ -59,6 +80,7 @@ export default async function handler(req, res) {
       data: error.response?.data,
     });
 
+    // Comprehensive error handling
     if (error.response) {
       res.status(error.response.status).json({
         error: "Failed to fetch image",
