@@ -82,30 +82,40 @@ export default function Page() {
     try {
       const urlParts = new URL(originalUrl);
 
-      // More careful URL cleaning that preserves more of the original structure
-      const pathSegments = urlParts.pathname.split("/");
+      // Special handling for wikia.nocookie.net URLs
+      if (
+        urlParts.hostname.includes("wikia.nocookie.net") ||
+        urlParts.hostname.includes("static.wikia.nocookie.net")
+      ) {
+        // Attempt to reconstruct the URL more precisely
+        const pathSegments = urlParts.pathname.split("/");
 
-      // Find the last meaningful path segment (typically the image filename)
-      const meaningfulSegments = pathSegments.filter(
-        (segment) =>
-          segment !== "" &&
-          !segment.includes("cb=") &&
-          !segment.includes("scale-to-width-down")
-      );
+        // Find the index of 'images' to preserve the full image path
+        const imagesIndex = pathSegments.indexOf("images");
 
-      // Reconstruct a clean URL that maintains the original image path
-      const cleanPath =
-        meaningfulSegments.length > 0
-          ? meaningfulSegments.join("/")
-          : urlParts.pathname;
+        if (imagesIndex !== -1) {
+          // Reconstruct the URL up to the image filename
+          const imagePathSegments = pathSegments.slice(0, imagesIndex + 3);
+          const cleanPath = imagePathSegments.join("/");
 
-      // Construct the clean URL, preserving more of the original structure
-      const cleanUrl = `${urlParts.protocol}//${urlParts.hostname}${
-        cleanPath.startsWith("/") ? cleanPath : "/" + cleanPath
-      }`;
+          const cleanUrl = `${urlParts.protocol}//${urlParts.hostname}${cleanPath}`;
+          const proxiedUrl = `/api/image-proxy?url=${encodeURIComponent(
+            originalUrl
+          )}`;
 
-      // Encode the entire URL for the proxy
-      const proxiedUrl = `/api/image-proxy?url=${encodeURIComponent(cleanUrl)}`;
+          console.log("Original URL:", originalUrl);
+          console.log("Cleaned URL:", cleanUrl);
+          console.log("Proxied URL:", proxiedUrl);
+
+          return proxiedUrl;
+        }
+      }
+
+      // Fallback to original method for other URLs
+      const cleanUrl = `${urlParts.protocol}//${urlParts.hostname}${urlParts.pathname}`;
+      const proxiedUrl = `/api/image-proxy?url=${encodeURIComponent(
+        originalUrl
+      )}`;
 
       console.log("Original URL:", originalUrl);
       console.log("Cleaned URL:", cleanUrl);
@@ -114,7 +124,6 @@ export default function Page() {
       return proxiedUrl;
     } catch (error) {
       console.error("Error processing image URL:", error);
-      // Fallback to direct proxy of original URL
       return `/api/image-proxy?url=${encodeURIComponent(originalUrl)}`;
     }
   }
