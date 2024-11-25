@@ -212,7 +212,6 @@ export default function Page() {
                               character.image_url
                             );
                             e.target.onerror = null; // Prevent infinite error loop
-                            e.target.src = "/path/to/fallback/image.jpg"; // Optional fallback image
                           }}
                           className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
                         />
@@ -296,7 +295,6 @@ export default function Page() {
                             character.image_url
                           );
                           e.target.onerror = null; // Prevent infinite error loop
-                          e.target.src = "/path/to/fallback/image.jpg"; // Optional fallback image
                         }}
                         className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
                       />
