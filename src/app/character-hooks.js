@@ -72,6 +72,44 @@ export function useTopCharacters() {
   return { topCharacters, loading, error };
 }
 
+export function useVotesRemaining() {
+  const [votesRemaining, setVotesRemaining] = useState(5);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchVotesRemaining = async () => {
+      if (!user) {
+        setVotesRemaining(0);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("user_daily_votes")
+          .select("vote_count")
+          .eq("user_id", user.id)
+          .eq("vote_date", new Date().toISOString().split("T")[0])
+          .single();
+
+        if (error) throw error;
+
+        setVotesRemaining(5 - (data?.vote_count || 0));
+      } catch (err) {
+        console.error("Error fetching votes remaining:", err);
+        setVotesRemaining(5); // Assume no votes if error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVotesRemaining();
+  }, [user]);
+
+  return { votesRemaining, loading };
+}
+
 export async function voteForCharacter(characterId) {
   const {
     data: { session },
@@ -87,7 +125,14 @@ export async function voteForCharacter(characterId) {
       character_id: characterId,
     });
 
-    if (voteError) throw voteError;
+    if (voteError) {
+      throw new Error(voteError.message);
+    }
+
+    if (!data.success) {
+      return { success: false, error: data.error };
+    }
+
     return { success: true };
   } catch (err) {
     console.error("Error voting for character:", err);

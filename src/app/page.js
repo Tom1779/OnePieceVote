@@ -11,6 +11,7 @@ import {
   voteForCharacter,
 } from "./character-hooks";
 import { useAuth } from "../contexts/auth-context";
+import { useVotesRemaining } from "./character-hooks";
 
 export default function Page() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,6 +28,8 @@ export default function Page() {
     loading: topLoading,
     error: topError,
   } = useTopCharacters();
+
+  const { votesRemaining, loading: votesLoading } = useVotesRemaining();
 
   const openModal = (image) => {
     setSelectedImage(image);
@@ -127,9 +130,31 @@ export default function Page() {
                   size={20}
                 />
               </div>
-              {!user && (
+              {!user ? (
                 <div className="text-center text-yellow-400 mb-4">
                   Please sign in to vote for characters!
+                </div>
+              ) : (
+                <div className="flex items-center justify-between px-4 py-2 bg-gray-900/50 rounded-lg mb-4">
+                  <div className="text-gray-300">
+                    Votes remaining today:
+                    {votesLoading ? (
+                      <span className="ml-2 animate-pulse">Loading...</span>
+                    ) : (
+                      <span
+                        className={`ml-2 font-bold ${
+                          votesRemaining > 0 ? "text-green-400" : "text-red-400"
+                        }`}
+                      >
+                        {votesRemaining}
+                      </span>
+                    )}
+                  </div>
+                  {votesRemaining === 0 && (
+                    <div className="text-red-400 text-sm">
+                      Daily limit reached! Come back tomorrow.
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -173,11 +198,11 @@ export default function Page() {
                           handleVote(character.id);
                         }}
                         className={`px-4 py-2 rounded-lg text-white font-medium transition-colors ${
-                          user
+                          user && votesRemaining > 0
                             ? "bg-blue-600 hover:bg-blue-700"
                             : "bg-blue-600/50 cursor-not-allowed"
                         } ${isPending ? "opacity-50 cursor-wait" : ""}`}
-                        disabled={!user || isPending}
+                        disabled={!user || votesRemaining === 0 || isPending}
                       >
                         {isPending ? "Voting..." : "Vote"}
                       </button>
