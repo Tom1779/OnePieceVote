@@ -14,7 +14,7 @@ export default function ImageModal({ src, alt, onClose }) {
       onClick={handleBackdropClick}
     >
       <div className="relative max-w-[90vw] max-h-[90vh] bg-gray-900 rounded-xl">
-        <div className="relative w-[80vw] h-[80vh]">
+        <div className="relative w-[80vw] h-[80vh] flex items-center justify-center">
           <Image
             src={src}
             alt={alt || "Image"}
