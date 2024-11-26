@@ -14,14 +14,15 @@ export default function ImageModal({ src, alt, onClose }) {
       onClick={handleBackdropClick}
     >
       <div className="relative max-w-[90vw] max-h-[90vh] bg-gray-900 rounded-xl">
-        <Image
-          src={src}
-          alt={alt}
-          width={1200}
-          height={1200}
-          style={{ objectFit: "contain" }}
-          className="rounded-xl max-h-[90vh] w-auto"
-        />
+        <div className="relative w-[80vw] h-[80vh]">
+          <Image
+            src={src}
+            alt={alt || "Image"}
+            fill
+            style={{ objectFit: "contain" }}
+            className="rounded-xl"
+          />
+        </div>
         <button
           onClick={onClose}
           className="absolute top-2 right-2 p-2 bg-black/50 hover:bg-black/75 rounded-full transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/50"
