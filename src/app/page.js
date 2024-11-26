@@ -78,23 +78,6 @@ export default function Page() {
     [user, updateLocalVote, updateLocalVotesRemaining, fetchTopCharacters]
   );
 
-  function proxyImageUrl(originalUrl) {
-    try {
-      // Simply pass the original URL through the proxy
-      const proxiedUrl = `/api/image-proxy?url=${encodeURIComponent(
-        originalUrl
-      )}`;
-
-      console.log("Original URL:", originalUrl);
-      console.log("Proxied URL:", proxiedUrl);
-
-      return proxiedUrl;
-    } catch (error) {
-      console.error("Error processing image URL:", error);
-      return originalUrl; // Fallback to original URL if something goes wrong
-    }
-  }
-
   return (
     <div className="min-h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       {/* Navigation Bar - Made more compact on mobile */}
@@ -215,16 +198,12 @@ export default function Page() {
                         onClick={() => openModal(character.image_url)}
                         className="flex-shrink-0"
                       >
-                        <img
-                          src={proxyImageUrl(character.image_url)}
+                        <Image
+                          src={character.image_url}
                           alt={character.name}
-                          onError={(e) => {
-                            console.error(
-                              "Image load error for URL:",
-                              character.image_url
-                            );
-                            e.target.onerror = null; // Prevent infinite error loop
-                          }}
+                          width={700}
+                          height={700}
+                          style={{ objectFit: "contain" }}
                           className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
                         />
                       </div>
@@ -298,16 +277,12 @@ export default function Page() {
                   </div>
                   <div className="relative">
                     <div onClick={() => openModal(character.image_url)}>
-                      <img
-                        src={proxyImageUrl(character.image_url)}
+                      <Image
+                        src={character.image_url}
                         alt={character.name}
-                        onError={(e) => {
-                          console.error(
-                            "Image load error for URL:",
-                            character.image_url
-                          );
-                          e.target.onerror = null; // Prevent infinite error loop
-                        }}
+                        style={{ objectFit: "contain" }}
+                        width={700}
+                        height={700}
                         className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
                       />
                     </div>
