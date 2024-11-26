@@ -13,14 +13,14 @@ export default function ImageModal({ src, alt, onClose }) {
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4"
       onClick={handleBackdropClick}
     >
-      <div className="relative max-w-[90vw] max-h-[90vh] bg-gray-900 rounded-xl">
+      <div className="relative max-w-[90vw] max-h-[90vh] bg-gray-900 rounded-xl sm:max-w-[70vw] sm:max-h-[70vh] lg:max-w-[60vw] lg:max-h-[60vh]">
         <Image
           src={src}
           alt={alt}
-          width={700}
-          height={700}
+          width={1200} // Increased size for larger screens
+          height={1200}
           style={{ objectFit: "contain" }}
-          className="rounded-xl max-h-[90vh] w-auto"
+          className="rounded-xl w-auto h-auto max-h-[90vh] sm:max-h-[70vh] lg:max-h-[60vh]"
         />
         <button
           onClick={onClose}
