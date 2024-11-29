@@ -18,6 +18,8 @@ export default function Page() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isPending, startTransition] = useTransition();
   const { user, signIn, signOut } = useAuth();
+  // Usage in component
+  const [proxyUrl, setProxyUrl] = useState("");
 
   const {
     characters,
@@ -78,24 +80,29 @@ export default function Page() {
     [user, updateLocalVote, updateLocalVotesRemaining, fetchTopCharacters]
   );
 
-  function proxyImageUrl(originalUrl) {
+  async function fetchImageProxy(url) {
     try {
-      console.log(originalUrl);
-      // Remove any existing URL encoding
-      const cleanUrl = decodeURIComponent(originalUrl);
-      console.log(cleanUrl);
-
-      // Validate the URL
-      new URL(cleanUrl);
-
-      // Encode the URL carefully
-      return `https://images.weserv.nl/?url=${encodeURIComponent(
-        cleanUrl
-      ).replace(/['()]/g, escape)}`;
+      const response = await fetch(
+        `https://images.weserv.nl/?url=${encodeURIComponent(url)}`
+      );
+      if (!response.ok) {
+        throw new Error("Image fetch failed");
+      }
+      return URL.createObjectURL(await response.blob());
     } catch (error) {
-      console.error("Invalid image URL:", originalUrl, error);
+      console.error("Image proxy error:", error);
+      return "/default-character.png";
     }
   }
+
+  useEffect(() => {
+    async function loadProxyImage() {
+      const proxiedUrl = await fetchImageProxy(character.image_url);
+      setProxyUrl(proxiedUrl);
+    }
+
+    loadProxyImage();
+  }, [character.image_url]);
 
   return (
     <div className="min-h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
@@ -218,7 +225,7 @@ export default function Page() {
                         className="flex-shrink-0"
                       >
                         <Image
-                          src={proxyImageUrl(character.image_url)}
+                          src={proxyUrl}
                           alt={character.name}
                           width={700}
                           height={700}
@@ -297,7 +304,7 @@ export default function Page() {
                   <div className="relative">
                     <div onClick={() => openModal(character.image_url)}>
                       <Image
-                        src={proxyImageUrl(character.image_url)}
+                        src={proxyUrl}
                         alt={character.name}
                         style={{ objectFit: "contain" }}
                         width={700}
