@@ -47,6 +47,17 @@ export default function Page() {
     setSelectedImage(null);
   };
 
+  // Utility function to generate image src based on character name
+  const generateImageSrc = (character) => {
+    return `/characters/${character.name
+      .toLowerCase()
+      .replace(/ /g, "_")
+      .replace(
+        /[^a-zA-Z0-9áàäâéèêëíìïîóòöôúùüûçñÁÀÄÂÉÈÊËÍÌÏÎÓÒÖÔÚÙÜÛÇÑ_-]/g,
+        ""
+      )}.png`;
+  };
+
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const handleVote = useCallback(
@@ -195,17 +206,11 @@ export default function Page() {
                       className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-900/50 rounded-lg sm:rounded-xl border border-gray-700 hover:border-gray-600 transition-all duration-300"
                     >
                       <div
-                        onClick={() => openModal(character.image_url)}
+                        onClick={() => openModal(generateImageSrc(character))}
                         className="flex-shrink-0"
                       >
                         <Image
-                          src={`/characters/${character.name
-                            .toLowerCase()
-                            .replace(/ /g, "_")
-                            .replace(
-                              /[^a-zA-Z0-9áàäâéèêëíìïîóòöôúùüûçñÁÀÄÂÉÈÊËÍÌÏÎÓÒÖÔÚÙÜÛÇÑ_-]/g,
-                              ""
-                            )}.png`}
+                          src={generateImageSrc(character)}
                           alt={character.name}
                           width={700}
                           height={700}
@@ -283,15 +288,9 @@ export default function Page() {
                     #{index + 1}
                   </div>
                   <div className="relative">
-                    <div onClick={() => openModal(character.image_url)}>
+                    <div onClick={() => openModal(generateImageSrc(character))}>
                       <Image
-                        src={`/characters/${character.name
-                          .toLowerCase()
-                          .replace(/ /g, "_")
-                          .replace(
-                            /[^a-zA-Z0-9áàäâéèêëíìïîóòöôúùüûçñÁÀÄÂÉÈÊËÍÌÏÎÓÒÖÔÚÙÜÛÇÑ_-]/g,
-                            ""
-                          )}.png`}
+                        src={generateImageSrc(character)}
                         alt={character.name}
                         style={{ objectFit: "contain" }}
                         width={700}
