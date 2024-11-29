@@ -195,19 +195,16 @@ export default function Page() {
                       className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-900/50 rounded-lg sm:rounded-xl border border-gray-700 hover:border-gray-600 transition-all duration-300"
                     >
                       <div
-                        onClick={() =>
-                          openModal(
-                            `/characters/${character.name
-                              .toLowerCase()
-                              .replace(/ /g, "_")}.png`
-                          )
-                        }
+                        onClick={() => openModal(character.image_url)}
                         className="flex-shrink-0"
                       >
                         <Image
-                          src={`/characters/${character.name
-                            .toLowerCase()
-                            .replace(/ /g, "_")}.png`}
+                          src={`/characters/${
+                            character.name
+                              .toLowerCase()
+                              .replace(/[^a-z0-9áéíóúñü_-]/g, "") // Removes anything that isn't a letter, number, hyphen, underscore, or accented letter
+                              .replace(/\s+/g, "_") // Replaces spaces with underscores
+                          }.png`}
                           alt={character.name}
                           width={700}
                           height={700}
