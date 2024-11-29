@@ -199,7 +199,7 @@ export default function Page() {
                         className="flex-shrink-0"
                       >
                         <Image
-                          src={`/characters/${character.name
+                          src={`/${character.name
                             .toLowerCase()
                             .replace(/ /g, "_")}.png`}
                           alt={character.name}
