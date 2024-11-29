@@ -8,5 +8,6 @@ module.exports = {
         pathname: "**",
       },
     ],
+    domains: ["https://www.onepiecevoting.com/"],
   },
 };
