@@ -199,10 +199,17 @@ export default function Page() {
                         className="flex-shrink-0"
                       >
                         <Image
-                          src={`/characters/${character.name
-                            .toLowerCase()
-                            .replace(/[^a-z0-9-_]/g, "")
-                            .replace(/ /g, "_")}.png`}
+                          src={(() => {
+                            const filename =
+                              character.name
+                                .toLowerCase()
+                                .replace(/[^a-z0-9-_]/g, "")
+                                .replace(/ /g, "_") + ".png";
+                            console.log(
+                              `Attempting to load image: /characters/${filename}`
+                            );
+                            return `/characters/${filename}`;
+                          })()}
                           alt={character.name}
                           width={700}
                           height={700}
