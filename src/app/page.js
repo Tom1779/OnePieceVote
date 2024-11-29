@@ -208,7 +208,7 @@ export default function Page() {
                             console.log(
                               `Attempting to load image: /characters/${filename}`
                             );
-                            return `/characters/${filename}`;
+                            return `https://www.onepiecevoting.com/characters/${filename}`;
                           })()}
                           alt={character.name}
                           width={700}
