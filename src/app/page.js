@@ -195,7 +195,13 @@ export default function Page() {
                       className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-900/50 rounded-lg sm:rounded-xl border border-gray-700 hover:border-gray-600 transition-all duration-300"
                     >
                       <div
-                        onClick={() => openModal(character.image_url)}
+                        onClick={() =>
+                          openModal(
+                            `/characters/${character.name
+                              .toLowerCase()
+                              .replace(/ /g, "_")}.png`
+                          )
+                        }
                         className="flex-shrink-0"
                       >
                         <Image
