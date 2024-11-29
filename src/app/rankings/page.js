@@ -21,6 +21,17 @@ const RankingsPage = () => {
     setSelectedImage(null);
   };
 
+  // Utility function to generate image src based on character name
+  const generateImageSrc = (character) => {
+    return `/characters/${character.name
+      .toLowerCase()
+      .replace(/ /g, "_")
+      .replace(
+        /[^a-zA-Z0-9áàäâéèêëíìïîóòöôúùüûçñÁÀÄÂÉÈÊËÍÌÏÎÓÒÖÔÚÙÜÛÇÑ_-]/g,
+        ""
+      )}.png`;
+  };
+
   useEffect(() => {
     const fetchCharacters = async () => {
       try {
@@ -125,17 +136,11 @@ const RankingsPage = () => {
                 </div>
                 <div className="flex items-center gap-2 sm:gap-4 min-w-0">
                   <div
-                    onClick={() => openModal(character.image_url)}
+                    onClick={() => openModal(generateImageSrc(character))}
                     className="flex-shrink-0"
                   >
                     <Image
-                      src={`/characters/${character.name
-                        .toLowerCase()
-                        .replace(/ /g, "_")
-                        .replace(
-                          /[^a-zA-Z0-9áàäâéèêëíìïîóòöôúùüûçñÁÀÄÂÉÈÊËÍÌÏÎÓÒÖÔÚÙÜÛÇÑ_-]/g,
-                          ""
-                        )}.png`}
+                      src={generateImageSrc(character)}
                       alt={character.name}
                       width={700}
                       height={700}
