@@ -79,7 +79,20 @@ export default function Page() {
   );
 
   function proxyImageUrl(originalUrl) {
-    return `https://images.weserv.nl/?url=${encodeURIComponent(originalUrl)}`;
+    try {
+      // Remove any existing URL encoding
+      const cleanUrl = decodeURIComponent(originalUrl);
+
+      // Validate the URL
+      new URL(cleanUrl);
+
+      // Encode the URL carefully
+      return `https://images.weserv.nl/?url=${encodeURIComponent(
+        cleanUrl
+      ).replace(/['()]/g, escape)}`;
+    } catch (error) {
+      console.error("Invalid image URL:", originalUrl, error);
+    }
   }
 
   return (
