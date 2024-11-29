@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useTransition } from "react";
+import { useState, useCallback, useTransition, useEffect } from "react";
 import { Search, List, Star, Trophy, LogIn, LogOut } from "lucide-react";
 import ImageModal from "./components/ImageModal";
 import Link from "next/link";
