@@ -21,6 +21,7 @@ export default function ImageModal({ src, alt, onClose }) {
           height={700}
           style={{ objectFit: "contain" }}
           className="rounded-xl"
+          unoptimized
         />
         <button
           onClick={onClose}
