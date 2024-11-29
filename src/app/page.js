@@ -78,6 +78,10 @@ export default function Page() {
     [user, updateLocalVote, updateLocalVotesRemaining, fetchTopCharacters]
   );
 
+  function proxyImageUrl(originalUrl) {
+    return `https://images.weserv.nl/?url=${encodeURIComponent(originalUrl)}`;
+  }
+
   return (
     <div className="min-h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       {/* Navigation Bar - Made more compact on mobile */}
@@ -199,7 +203,7 @@ export default function Page() {
                         className="flex-shrink-0"
                       >
                         <Image
-                          src={character.image_url}
+                          src={proxyImageUrl(character.image_url)}
                           alt={character.name}
                           width={700}
                           height={700}
@@ -278,7 +282,7 @@ export default function Page() {
                   <div className="relative">
                     <div onClick={() => openModal(character.image_url)}>
                       <Image
-                        src={character.image_url}
+                        src={proxyImageUrl(character.image_url)}
                         alt={character.name}
                         style={{ objectFit: "contain" }}
                         width={700}
