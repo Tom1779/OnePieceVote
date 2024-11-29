@@ -199,12 +199,9 @@ export default function Page() {
                         className="flex-shrink-0"
                       >
                         <Image
-                          src={`/characters/${
-                            character.name
-                              .toLowerCase()
-                              .replace(/[^a-z0-9áéíóúñü_-]/g, "") // Removes anything that isn't a letter, number, hyphen, underscore, or accented letter
-                              .replace(/\s+/g, "_") // Replaces spaces with underscores
-                          }.png`}
+                          src={`/characters/${character.name
+                            .toLowerCase()
+                            .replace(/ /g, "_")}.png`}
                           alt={character.name}
                           width={700}
                           height={700}
