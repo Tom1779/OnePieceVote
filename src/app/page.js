@@ -285,11 +285,18 @@ export default function Page() {
                   <div className="relative">
                     <div onClick={() => openModal(character.image_url)}>
                       <Image
-                        src={character.image_url}
+                        src={`/characters/${character.name
+                          .toLowerCase()
+                          .replace(/ /g, "_")
+                          .replace(
+                            /[^a-zA-Z0-9áàäâéèêëíìïîóòöôúùüûçñÁÀÄÂÉÈÊËÍÌÏÎÓÒÖÔÚÙÜÛÇÑ_-]/g,
+                            ""
+                          )}.png`}
                         alt={character.name}
                         style={{ objectFit: "contain" }}
                         width={700}
                         height={700}
+                        unoptimized
                         className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
                       />
                     </div>
