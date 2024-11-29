@@ -129,7 +129,7 @@ const RankingsPage = () => {
                     className="flex-shrink-0"
                   >
                     <Image
-                      src={`/characters/${character.name
+                      src={`../characters/${character.name
                         .toLowerCase()
                         .replace(/ /g, "_")
                         .replace(
