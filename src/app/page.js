@@ -201,7 +201,8 @@ export default function Page() {
                         <Image
                           src={`/characters/${character.name
                             .toLowerCase()
-                            .replace(/ /g, "_")}.png`}
+                            .replace(/ /g, "_")
+                            .replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ_-]/g, "")}.png`}
                           alt={character.name}
                           width={700}
                           height={700}
