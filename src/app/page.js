@@ -199,7 +199,7 @@ export default function Page() {
                         className="flex-shrink-0"
                       >
                         <Image
-                          src={`/characters/${character.name}`}
+                          src={`characters/${character.name}`}
                           alt={character.name}
                           width={700}
                           height={700}
