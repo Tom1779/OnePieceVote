@@ -80,8 +80,10 @@ export default function Page() {
 
   function proxyImageUrl(originalUrl) {
     try {
+      console.log(originalUrl);
       // Remove any existing URL encoding
       const cleanUrl = decodeURIComponent(originalUrl);
+      console.log(cleanUrl);
 
       // Validate the URL
       new URL(cleanUrl);
