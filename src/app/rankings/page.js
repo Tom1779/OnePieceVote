@@ -129,7 +129,7 @@ const RankingsPage = () => {
                     className="flex-shrink-0"
                   >
                     <Image
-                      src={`../characters/${character.name
+                      src={`/characters/${character.name
                         .toLowerCase()
                         .replace(/ /g, "_")
                         .replace(
@@ -140,6 +140,7 @@ const RankingsPage = () => {
                       width={700}
                       height={700}
                       style={{ objectFit: "contain" }}
+                      unoptimized
                       className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
                     />
                   </div>
