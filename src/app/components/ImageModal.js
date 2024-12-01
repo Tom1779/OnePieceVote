@@ -4,18 +4,20 @@ import { useState, useEffect } from "react";
 
 export default function ImageModal({ src, alt, onClose }) {
   const [imageDimensions, setImageDimensions] = useState({
-    width: 300,
-    height: 300,
+    width: 0,
+    height: 0,
+    maxWidth: 0,
+    maxHeight: 0,
   });
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
-    const img = new window.Image(); // Use window.Image explicitly
+    const img = new window.Image();
     img.src = src;
     img.onload = () => {
-      // Calculate maximum dimensions while maintaining aspect ratio
-      const maxWidth = window.innerWidth * 0.8;
-      const maxHeight = window.innerHeight * 0.8;
+      // Calculate maximum dimensions
+      const maxWidth = window.innerWidth * 0.9; // Increased from 0.8 to 0.9
+      const maxHeight = window.innerHeight * 0.9; // Increased from 0.8 to 0.9
 
       const aspectRatio = img.width / img.height;
 
@@ -51,6 +53,8 @@ export default function ImageModal({ src, alt, onClose }) {
       setImageDimensions({
         width: Math.round(newWidth),
         height: Math.round(newHeight),
+        maxWidth,
+        maxHeight,
       });
     };
 
@@ -90,21 +94,33 @@ export default function ImageModal({ src, alt, onClose }) {
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4"
       onClick={handleBackdropClick}
     >
-      <div className="relative bg-gray-900 rounded-xl flex items-center justify-center">
-        <Image
-          src={src}
-          alt={alt || "Image"}
-          width={imageDimensions.width}
-          height={imageDimensions.height}
-          style={{
-            objectFit: "contain",
-            maxWidth: "80vw",
-            maxHeight: "80vh",
-          }}
-          className="rounded-xl"
-          onError={() => setImageError(true)}
-          unoptimized
-        />
+      <div
+        className="relative bg-gray-900 rounded-xl flex items-center justify-center"
+        style={{
+          width: imageDimensions.width,
+          height: imageDimensions.height,
+          maxWidth: imageDimensions.maxWidth,
+          maxHeight: imageDimensions.maxHeight,
+        }}
+      >
+        {imageDimensions.width > 0 && (
+          <Image
+            src={src}
+            alt={alt || "Image"}
+            width={imageDimensions.width}
+            height={imageDimensions.height}
+            style={{
+              objectFit: "contain",
+              width: "100%",
+              height: "100%",
+              maxWidth: "100%",
+              maxHeight: "100%",
+            }}
+            className="rounded-xl"
+            onError={() => setImageError(true)}
+            unoptimized
+          />
+        )}
         <button
           onClick={onClose}
           className="absolute top-2 right-2 p-2 bg-black/50 hover:bg-black/75 rounded-full transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/50"
