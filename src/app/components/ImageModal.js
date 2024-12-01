@@ -16,8 +16,8 @@ export default function ImageModal({ src, alt, onClose }) {
     img.src = src;
     img.onload = () => {
       // Calculate maximum dimensions
-      const maxWidth = window.innerWidth * 0.9; // Increased from 0.8 to 0.9
-      const maxHeight = window.innerHeight * 0.9; // Increased from 0.8 to 0.9
+      const maxWidth = window.innerWidth; // Increased from 0.8 to 0.9
+      const maxHeight = window.innerHeight; // Increased from 0.8 to 0.9
 
       const aspectRatio = img.width / img.height;
 
