@@ -17,8 +17,9 @@ export default function ImageModal({ src, alt, onClose }) {
         <Image
           src={src}
           alt={alt || "Image"}
-          width={700}
-          height={700}
+          layout="intrinsic"
+          width={1000}
+          height={1000}
           style={{
             objectFit: "contain",
             maxWidth: "90vw",
