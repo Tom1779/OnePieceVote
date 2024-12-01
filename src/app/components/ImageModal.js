@@ -17,8 +17,8 @@ export default function ImageModal({ src, alt, onClose }) {
         <Image
           src={src}
           alt={alt || "Image"}
-          width={600}
-          height={600}
+          width={500}
+          height={500}
           style={{ objectFit: "contain" }}
           className="rounded-xl"
           unoptimized
