@@ -13,7 +13,7 @@ export default function ImageModal({ src, alt, onClose }) {
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 overlow-hidden"
       onClick={handleBackdropClick}
     >
-      <div className="relative max-w-[80vw] max-h-[80vh] bg-gray-900 rounded-xl flex items-center justify-center">
+      <div className="relative max-w-[90vw] max-h-[90vh] bg-gray-900 rounded-xl flex items-center justify-center">
         <Image
           src={src}
           alt={alt || "Image"}
@@ -21,8 +21,8 @@ export default function ImageModal({ src, alt, onClose }) {
           height={700}
           style={{
             objectFit: "contain",
-            maxWidth: "80vw",
-            maxHeight: "80vh",
+            maxWidth: "90vw",
+            maxHeight: "90vh",
             width: "auto",
             height: "auto",
           }}
