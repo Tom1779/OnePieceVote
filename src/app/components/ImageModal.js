@@ -1,7 +1,59 @@
 import Image from "next/image";
 import { X } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export default function ImageModal({ src, alt, onClose }) {
+  const [imageDimensions, setImageDimensions] = useState({
+    width: 300,
+    height: 300,
+  });
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = src;
+    img.onload = () => {
+      // Calculate maximum dimensions while maintaining aspect ratio
+      const maxWidth = window.innerWidth * 0.8;
+      const maxHeight = window.innerHeight * 0.8;
+
+      const aspectRatio = img.width / img.height;
+
+      let newWidth, newHeight;
+      if (img.width > maxWidth || img.height > maxHeight) {
+        if (aspectRatio > 1) {
+          // Wide image
+          newWidth = Math.min(img.width, maxWidth);
+          newHeight = newWidth / aspectRatio;
+
+          // Adjust height if it's still too tall
+          if (newHeight > maxHeight) {
+            newHeight = maxHeight;
+            newWidth = newHeight * aspectRatio;
+          }
+        } else {
+          // Tall image
+          newHeight = Math.min(img.height, maxHeight);
+          newWidth = newHeight * aspectRatio;
+
+          // Adjust width if it's still too wide
+          if (newWidth > maxWidth) {
+            newWidth = maxWidth;
+            newHeight = newWidth / aspectRatio;
+          }
+        }
+      } else {
+        // Image is smaller than max dimensions
+        newWidth = img.width;
+        newHeight = img.height;
+      }
+
+      setImageDimensions({
+        width: Math.round(newWidth),
+        height: Math.round(newHeight),
+      });
+    };
+  }, [src]);
+
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -13,13 +65,17 @@ export default function ImageModal({ src, alt, onClose }) {
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4"
       onClick={handleBackdropClick}
     >
-      <div className="relative max-w-[80vw] max-h-[80vh] bg-gray-900 rounded-xl flex items-center justify-center">
+      <div className="relative bg-gray-900 rounded-xl flex items-center justify-center">
         <Image
           src={src}
           alt={alt || "Image"}
-          width={250}
-          height={250}
-          style={{ objectFit: "contain" }}
+          width={imageDimensions.width}
+          height={imageDimensions.height}
+          style={{
+            objectFit: "contain",
+            maxWidth: "80vw",
+            maxHeight: "80vh",
+          }}
           className="rounded-xl"
           unoptimized
         />
