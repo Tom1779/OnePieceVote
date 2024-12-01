@@ -7,9 +7,10 @@ export default function ImageModal({ src, alt, onClose }) {
     width: 300,
     height: 300,
   });
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
-    const img = new Image();
+    const img = new window.Image(); // Use window.Image explicitly
     img.src = src;
     img.onload = () => {
       // Calculate maximum dimensions while maintaining aspect ratio
@@ -52,6 +53,11 @@ export default function ImageModal({ src, alt, onClose }) {
         height: Math.round(newHeight),
       });
     };
+
+    img.onerror = () => {
+      console.error(`Failed to load image: ${src}`);
+      setImageError(true);
+    };
   }, [src]);
 
   const handleBackdropClick = (e) => {
@@ -59,6 +65,25 @@ export default function ImageModal({ src, alt, onClose }) {
       onClose();
     }
   };
+
+  if (imageError) {
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4"
+        onClick={handleBackdropClick}
+      >
+        <div className="bg-red-600 text-white p-6 rounded-xl text-center">
+          <p>Unable to load image</p>
+          <button
+            onClick={onClose}
+            className="mt-4 bg-red-800 hover:bg-red-700 px-4 py-2 rounded"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -77,6 +102,7 @@ export default function ImageModal({ src, alt, onClose }) {
             maxHeight: "80vh",
           }}
           className="rounded-xl"
+          onError={() => setImageError(true)}
           unoptimized
         />
         <button
