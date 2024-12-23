@@ -1,6 +1,6 @@
 "use client";
 
 const PrivacyPage = () => {
-  return <Div></Div>;
+  return <div></div>;
 };
 export default PrivacyPage;
