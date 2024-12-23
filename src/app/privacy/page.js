@@ -1,3 +1,6 @@
 "use client";
 
-return <Div></Div>;
+const PrivacyPage = () => {
+  return <Div></Div>;
+};
+export default PrivacyPage;
