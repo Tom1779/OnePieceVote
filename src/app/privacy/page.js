@@ -115,10 +115,10 @@ export default function PrivacyPage() {
 
               <section>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  As we would prefer to not be contacted with questions, we are
-                  curently working on making it so every account has all of its
-                  information deleted after 7 days of inactivity so there will
-                  be no need to ask us to delete your account.
+                  As we would prefer to not be contacted with questions, we made
+                  it so every account has all of its information deleted after 7
+                  days of not being signed in. So there will be no need to ask
+                  us to delete your account.
                 </h2>
               </section>
 
