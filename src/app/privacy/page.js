@@ -43,8 +43,26 @@ export default function PrivacyPage() {
                 </p>
                 <ul className="list-disc pl-6 space-y-2">
                   <li>Your email address (for authentication purposes)</li>
-                  <li>Voting history (to maintain voting integrity)</li>
-                  <li>Session information (to manage your login status)</li>
+                  <li>
+                    We do not have access to your password as it encrypted
+                  </li>
+                  <li>
+                    Voting history (to limit accounts to 5 votes a day and
+                    prevent bot spamming)
+                  </li>
+                  <li>
+                    Session information (to keep you logged in next time you
+                    return to the website)
+                  </li>
+                  <li>
+                    Note that Session information is stored for 7 days and then
+                    deleted, as such you will have to sing in again after a week
+                  </li>
+                  <li>
+                    This project uses{" "}
+                    <Link href="https://supabase.com/docs"> Supabase </Link> as
+                    the storage database
+                  </li>
                 </ul>
               </section>
 
@@ -59,9 +77,8 @@ export default function PrivacyPage() {
                     Track and limit daily voting as per our platform rules
                   </li>
                   <li>
-                    Prevent duplicate voting and maintain voting integrity
+                    WE DO NOT SELL OR OTHERWISE DISTRIBUTE ANY OF OUR DATA
                   </li>
-                  <li>Improve our website and user experience</li>
                 </ul>
               </section>
 
@@ -83,10 +100,6 @@ export default function PrivacyPage() {
                     user accounts
                   </li>
                   <li>All data is transmitted over secure HTTPS connections</li>
-                  <li>
-                    We regularly update our security measures to protect against
-                    unauthorized access
-                  </li>
                 </ul>
               </section>
 
@@ -96,21 +109,17 @@ export default function PrivacyPage() {
                 </h2>
                 <p className="mb-3">You have the right to:</p>
                 <ul className="list-disc pl-6 space-y-2">
-                  <li>Access your personal data</li>
                   <li>Request deletion of your account and associated data</li>
-                  <li>Opt-out of any non-essential communications</li>
-                  <li>Request a copy of your voting history</li>
                 </ul>
               </section>
 
               <section>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  Contact Us
+                  As we would prefer to not be contacted with questions, we are
+                  curently working on making it so every account has all of its
+                  information deleted after 7 days of inactivity so there will
+                  be no need to ask us to delete your account.
                 </h2>
-                <p>
-                  If you have any questions about our privacy policy or how we
-                  handle your data, please contact us at [Your Contact Email].
-                </p>
               </section>
 
               <section className="pt-4 border-t border-gray-700">
