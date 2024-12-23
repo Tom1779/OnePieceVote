@@ -112,6 +112,16 @@ export default function Page() {
                   Rankings
                 </span>
               </Link>
+              <Link
+                href="/privacy"
+                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gray-800/50 text-blue-400 hover:bg-gray-700 transition-all duration-300 ease-in-out transform hover:scale-105"
+              >
+                <List size={16} className="sm:hidden" />
+                <Trophy size={16} className="hidden sm:block" />
+                <span className="text-sm sm:text-base font-medium">
+                  Privacy
+                </span>
+              </Link>
               {user ? (
                 <button
                   onClick={signOut}
