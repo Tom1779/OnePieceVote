@@ -44,7 +44,7 @@ export default function PrivacyPage() {
                 <ul className="list-disc pl-6 space-y-2">
                   <li>Your email address (for authentication purposes)</li>
                   <li>
-                    We do not have access to your password as it encrypted
+                    We do not have access to your password as it is encrypted
                   </li>
                   <li>
                     Voting history (to limit accounts to 5 votes a day and
@@ -56,12 +56,18 @@ export default function PrivacyPage() {
                   </li>
                   <li>
                     Note that Session information is stored for 7 days and then
-                    deleted, as such you will have to sing in again after a week
+                    deleted, as such you will have to sign in again after a week
                   </li>
                   <li>
                     This project uses{" "}
-                    <Link href="https://supabase.com/docs"> Supabase </Link> as
-                    the storage database
+                    <Link
+                      className="text-blue-200"
+                      href="https://supabase.com/docs"
+                    >
+                      {" "}
+                      Supabase{" "}
+                    </Link>{" "}
+                    as the storage database
                   </li>
                 </ul>
               </section>
@@ -77,7 +83,7 @@ export default function PrivacyPage() {
                     Track and limit daily voting as per our platform rules
                   </li>
                   <li>
-                    WE DO NOT SELL OR OTHERWISE DISTRIBUTE ANY OF OUR DATA
+                    WE DO NOT SELL OR OTHERWISE DISTRIBUTE ANY OF YOUR DATA
                   </li>
                 </ul>
               </section>
@@ -100,16 +106,6 @@ export default function PrivacyPage() {
                     user accounts
                   </li>
                   <li>All data is transmitted over secure HTTPS connections</li>
-                </ul>
-              </section>
-
-              <section>
-                <h2 className="text-xl font-semibold text-white mb-3">
-                  Your Rights
-                </h2>
-                <p className="mb-3">You have the right to:</p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Request deletion of your account and associated data</li>
                 </ul>
               </section>
 
