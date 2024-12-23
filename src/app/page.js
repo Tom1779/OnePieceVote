@@ -1,7 +1,15 @@
 "use client";
 
 import { useState, useCallback, useTransition } from "react";
-import { Search, List, Star, Trophy, LogIn, LogOut } from "lucide-react";
+import {
+  Search,
+  List,
+  Star,
+  Trophy,
+  Shield,
+  LogIn,
+  LogOut,
+} from "lucide-react";
 import ImageModal from "./components/ImageModal";
 import Link from "next/link";
 import Image from "next/image";
@@ -117,7 +125,7 @@ export default function Page() {
                 className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gray-800/50 text-blue-400 hover:bg-gray-700 transition-all duration-300 ease-in-out transform hover:scale-105"
               >
                 <List size={16} className="sm:hidden" />
-                <Trophy size={16} className="hidden sm:block" />
+                <Shield size={16} className="hidden sm:block" />
                 <span className="text-sm sm:text-base font-medium">
                   Privacy
                 </span>
