@@ -210,7 +210,36 @@ export default function Page() {
 
             {/* Search Results */}
             <div className="flex-1 mx-4 sm:mx-8 mb-4 sm:mb-8 border border-gray-700 rounded-xl p-3 sm:p-6 bg-gray-900/30 backdrop-blur-sm">
-              <div className="h-[600px] sm:h-[1104px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+              <div className="h-[600px] sm:h-[1104px] overflow-y-auto custom-scrollbar">
+                <style>
+                  {`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(31, 41, 55, 0.5);
+          border-radius: 4px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(59, 130, 246, 0.5);
+          border-radius: 4px;
+          transition: all 0.2s ease;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(59, 130, 246, 0.8);
+        }
+        
+        /* For Firefox */
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(59, 130, 246, 0.5) rgba(31, 41, 55, 0.5);
+        }
+      `}
+                </style>
                 {searchLoading ? (
                   <div className="flex items-center justify-center h-full">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
