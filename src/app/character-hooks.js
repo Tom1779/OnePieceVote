@@ -19,7 +19,7 @@ export function useCharacterSearch(searchQuery) {
           query = query.ilike("name", `%${searchQuery}%`);
         }
 
-        const { data, error: queryError } = await query.limit(10).order("name");
+        const { data, error: queryError } = await query.order("name");
 
         if (queryError) throw queryError;
         setCharacters(data || []);
