@@ -209,69 +209,71 @@ export default function Page() {
             </div>
 
             {/* Search Results */}
-            <div className="flex-1 mx-4 sm:mx-8 mb-4 sm:mb-8 border border-gray-700 rounded-xl p-3 sm:p-6 overflow-y-auto bg-gray-900/30 backdrop-blur-sm scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
-              {searchLoading ? (
-                <div className="flex items-center justify-center h-full">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                </div>
-              ) : searchError ? (
-                <div className="text-red-400 text-center">{searchError}</div>
-              ) : characters.length > 0 ? (
-                <div className="space-y-3 sm:space-y-4">
-                  {characters.map((character) => (
-                    <div
-                      key={character.id}
-                      className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-900/50 rounded-lg sm:rounded-xl border border-gray-700 hover:border-gray-600 transition-all duration-300"
-                    >
-                      <div
-                        onClick={() => openModal(generateImageSrc(character))}
-                        className="flex-shrink-0"
-                      >
-                        <Image
-                          src={generateImageSrc(character)}
-                          alt={character.name}
-                          width={700}
-                          height={700}
-                          style={{ objectFit: "contain" }}
-                          unoptimized
-                          className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-base sm:text-lg text-gray-200 break-words">
-                          {character.name}
-                        </div>
-                        <div className="text-xs sm:text-sm text-gray-400">
-                          {character.votes || 0} votes
-                        </div>
-                      </div>
-                      <button
-                        onClick={async () => {
-                          await sleep(100);
-                          handleVote(character.id);
-                        }}
-                        className={`flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-white text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
-                          user && votesRemaining > 0
-                            ? "bg-blue-600 hover:bg-blue-700"
-                            : "bg-blue-600/50 cursor-not-allowed"
-                        } ${isPending ? "opacity-50 cursor-wait" : ""}`}
-                        disabled={!user || votesRemaining === 0 || isPending}
-                      >
-                        {isPending ? "..." : "Vote"}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-full text-gray-400 space-y-3 sm:space-y-4 p-4">
-                  <Search size={36} className="text-gray-600 sm:size-48" />
-                  <div className="text-base sm:text-lg font-medium text-center">
-                    {searchQuery
-                      ? "No characters found"
-                      : "Search for a character to vote"}
+            <div className="flex-1 mx-4 sm:mx-8 mb-4 sm:mb-8 border border-gray-700 rounded-xl p-3 sm:p-6 bg-gray-900/30 backdrop-blur-sm">
+              <div className="h-[600px] sm:h-[1104px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+                {searchLoading ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                   </div>
-                </div>
-              )}
+                ) : searchError ? (
+                  <div className="text-red-400 text-center">{searchError}</div>
+                ) : characters.length > 0 ? (
+                  <div className="space-y-3 sm:space-y-4">
+                    {characters.map((character) => (
+                      <div
+                        key={character.id}
+                        className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-900/50 rounded-lg sm:rounded-xl border border-gray-700 hover:border-gray-600 transition-all duration-300"
+                      >
+                        <div
+                          onClick={() => openModal(generateImageSrc(character))}
+                          className="flex-shrink-0"
+                        >
+                          <Image
+                            src={generateImageSrc(character)}
+                            alt={character.name}
+                            width={700}
+                            height={700}
+                            style={{ objectFit: "contain" }}
+                            unoptimized
+                            className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-base sm:text-lg text-gray-200 break-words">
+                            {character.name}
+                          </div>
+                          <div className="text-xs sm:text-sm text-gray-400">
+                            {character.votes || 0} votes
+                          </div>
+                        </div>
+                        <button
+                          onClick={async () => {
+                            await sleep(100);
+                            handleVote(character.id);
+                          }}
+                          className={`flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-white text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
+                            user && votesRemaining > 0
+                              ? "bg-blue-600 hover:bg-blue-700"
+                              : "bg-blue-600/50 cursor-not-allowed"
+                          } ${isPending ? "opacity-50 cursor-wait" : ""}`}
+                          disabled={!user || votesRemaining === 0 || isPending}
+                        >
+                          {isPending ? "..." : "Vote"}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-400 space-y-3 sm:space-y-4 p-4">
+                    <Search size={36} className="text-gray-600 sm:size-48" />
+                    <div className="text-base sm:text-lg font-medium text-center">
+                      {searchQuery
+                        ? "No characters found"
+                        : "Search for a character to vote"}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
