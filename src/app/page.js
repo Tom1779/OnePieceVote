@@ -100,14 +100,13 @@ export default function Page() {
   return (
     <div className="min-h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       {/* Navigation Bar - Made more compact on mobile */}
-      // Navigation Bar Component
       <nav className="bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
           <div className="flex justify-between h-14 sm:h-16 items-center">
             {/* Logo and Title */}
             <div className="flex items-center space-x-2">
               <Star className="text-yellow-500 h-4 w-4 sm:h-6 sm:w-6" />
-              <div className="text-sm sm:text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent truncate max-w-[120px] sm:max-w-none">
+              <div className="text-xs sm:text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent truncate max-w-[120px] sm:max-w-none">
                 One Piece Character Voting
               </div>
             </div>
@@ -120,7 +119,7 @@ export default function Page() {
               >
                 <List size={14} className="sm:hidden" />
                 <Trophy size={16} className="hidden sm:block" />
-                <span className="text-xs sm:text-base font-medium">
+                <span className="text-[10px] sm:text-base font-medium">
                   Rankings
                 </span>
               </Link>
@@ -131,7 +130,7 @@ export default function Page() {
               >
                 <List size={14} className="sm:hidden" />
                 <Shield size={16} className="hidden sm:block" />
-                <span className="text-xs sm:text-base font-medium">
+                <span className="text-[10px] sm:text-base font-medium">
                   Privacy
                 </span>
               </Link>
@@ -142,7 +141,7 @@ export default function Page() {
                   className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-red-800/50 text-red-400 hover:bg-red-700 transition-all duration-300 ease-in-out transform hover:scale-105"
                 >
                   <LogOut size={14} className="sm:size-18" />
-                  <span className="text-xs sm:text-base font-medium">
+                  <span className="text-[10px] sm:text-base font-medium">
                     Sign Out
                   </span>
                 </button>
@@ -152,7 +151,7 @@ export default function Page() {
                   className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-blue-800/50 text-blue-400 hover:bg-blue-700 transition-all duration-300 ease-in-out transform hover:scale-105"
                 >
                   <LogIn size={14} className="sm:size-18" />
-                  <span className="text-xs sm:text-base font-medium">
+                  <span className="text-[10px] sm:text-base font-medium">
                     Sign In
                   </span>
                 </button>
@@ -161,6 +160,7 @@ export default function Page() {
           </div>
         </div>
       </nav>
+
       <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         {/* Changed to single column on mobile */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 min-h-[calc(100vh-3.5rem)] py-4 sm:py-8">
