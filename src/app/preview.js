@@ -10,7 +10,10 @@ export function Preview({ link, title, imageUrl }) {
         property="og:description"
         content="Vote for your favorite one piece characters"
       />
-      <meta property="og:image" content={imageUrl} />
+      <meta
+        property="og:image"
+        content="https://www.onepiecevoting.com/previews/home.png"
+      />
 
       <meta property="twitter:card" content="summary_large_image" />
       <meta property="twitter:url" content={link} />
