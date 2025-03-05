@@ -9,9 +9,6 @@ export async function GET(request) {
   if (code) {
     const supabase = createRouteHandlerClient({ cookies });
     await supabase.auth.exchangeCodeForSession(code);
-
-    // Redirect to the origin without any query parameters
-    return NextResponse.redirect(requestUrl.origin);
   }
 
   return NextResponse.redirect(requestUrl.origin);

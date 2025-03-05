@@ -44,21 +44,16 @@ export function AuthProvider({ children }) {
 
   const signIn = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             prompt: "select_account", // This is the key addition
           },
-          //prevent the token from appearing in URL
-          skipBrowserRedirect: true,
         },
       });
       if (error) throw error;
-      if (data?.url) {
-        window.location.href = data.url;
-      }
     } catch (error) {
       console.error("Error signing in:", error);
       throw error;
