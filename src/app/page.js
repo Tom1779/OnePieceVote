@@ -103,7 +103,7 @@ export default function Page() {
       <Preview
         link="https://www.onepiecevoting.com/"
         title="One Piece Voting"
-        imageUrl="/previews/home.png"
+        imageUrl="https://www.onepiecevoting.com/previews/home.png"
       />
       <div className="min-h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         {/* Navigation Bar - Made more compact on mobile */}
