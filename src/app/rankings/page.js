@@ -36,31 +36,22 @@ const RankingsPage = () => {
     const fetchCharacters = async () => {
       try {
         setLoading(true);
-        let allCharacters = [];
-        let page = 0;
-        const pageSize = 3000; // Supabase default max limit
 
-        while (true) {
-          const { data, error } = await supabase
-            .from("one_piece_characters")
-            .select("*")
-            .order("votes", { ascending: false })
-            .range(page * pageSize, (page + 1) * pageSize - 1);
+        // With 3000 limit, this should get all characters in one request
+        const { data, error } = await supabase
+          .from("one_piece_characters")
+          .select("*")
+          .order("votes", { ascending: false })
+          .limit(3000);
 
-          if (error) throw error;
+        if (error) throw error;
 
-          // Break the loop if no more data
-          if (!data || data.length === 0) break;
+        // Deduplicate by ID
+        const uniqueCharacters = Array.from(
+          new Map(data.map((char) => [char.id, char])).values()
+        );
 
-          allCharacters = [...allCharacters, ...data];
-
-          // If returned data is less than page size, we've reached the end
-          if (data.length < pageSize) break;
-
-          page++;
-        }
-
-        setCharacters(allCharacters);
+        setCharacters(uniqueCharacters);
       } catch (err) {
         console.error("Error fetching rankings:", err);
         setError(err.message);
