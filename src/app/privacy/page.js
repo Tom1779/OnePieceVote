@@ -63,6 +63,8 @@ export default function PrivacyPage() {
                     <Link
                       className="text-blue-200"
                       href="https://supabase.com/docs"
+                      target="_blank"
+                      rel="noopener noreferrer"
                     >
                       {" "}
                       Supabase{" "}
@@ -127,6 +129,8 @@ export default function PrivacyPage() {
                   <Link
                     className="text-blue-200"
                     href="https://onepiece.fandom.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     One Piece Wiki
                   </Link>
