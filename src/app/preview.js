@@ -14,6 +14,8 @@ export function Preview({ link, title, imageUrl }) {
         property="og:image"
         content="https://www.onepiecevoting.com/previews/home.png"
       />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
 
       <meta property="twitter:card" content="summary_large_image" />
       <meta property="twitter:url" content={link} />
