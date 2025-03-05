@@ -118,6 +118,21 @@ export default function PrivacyPage() {
                 </h2>
               </section>
 
+              <section>
+                <h2 className="text-xl font-semibold text-white mb-3">
+                  Special Thanks
+                </h2>
+                <p className="mb-3">
+                  All character data was collected from the{" "}
+                  <Link
+                    className="text-blue-200"
+                    href="https://onepiece.fandom.com/"
+                  >
+                    One Piece Wiki
+                  </Link>
+                </p>
+              </section>
+
               <section className="pt-4 border-t border-gray-700">
                 <p className="text-sm text-gray-400">
                   Last updated: {new Date().toLocaleDateString()}
