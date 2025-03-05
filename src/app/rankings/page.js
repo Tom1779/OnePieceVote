@@ -38,7 +38,7 @@ const RankingsPage = () => {
         setLoading(true);
         let allCharacters = [];
         let page = 0;
-        const pageSize = 1000; // Supabase default max limit
+        const pageSize = 3000; // Supabase default max limit
 
         while (true) {
           const { data, error } = await supabase
