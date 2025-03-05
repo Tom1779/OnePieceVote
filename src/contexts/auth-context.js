@@ -24,21 +24,18 @@ export function AuthProvider({ children }) {
         data: { session },
       } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
+      setLoading(false);
 
-      // Only clean up URL hash after session is processed
+      // If URL contains access_token, refresh the page after a short delay
       if (
         window.location.hash &&
         window.location.hash.includes("access_token")
       ) {
-        // Remove the hash without causing a page reload
-        window.history.replaceState(
-          null,
-          null,
-          window.location.pathname + window.location.search
-        );
+        // Wait a moment to ensure Supabase has properly processed the token
+        setTimeout(() => {
+          window.location.href = window.location.pathname; // Refresh to the same page without hash
+        }, 300); // Short delay to allow authentication to complete
       }
-
-      setLoading(false);
     };
 
     checkSession();
