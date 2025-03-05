@@ -20,19 +20,6 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     // Check active session
     const checkSession = async () => {
-      // Clear hash fragments from URL if they exist (for tokens)
-      if (
-        window.location.hash &&
-        window.location.hash.includes("access_token")
-      ) {
-        // Remove the hash without causing a page reload
-        window.history.replaceState(
-          null,
-          null,
-          window.location.pathname + window.location.search
-        );
-      }
-
       const {
         data: { session },
       } = await supabase.auth.getSession();
