@@ -3,23 +3,23 @@ import Head from "next/head";
 export function Preview({ link, title, imageUrl }) {
   return (
     <Head>
-      <meta property="og:type" content="website" />
-      <meta property="og:url" content={link} />
-      <meta property="og:title" content={title} />
+      <meta name="og:type" content="website" />
+      <meta name="og:url" content={link} />
+      <meta name="og:title" content={title} />
       <meta
-        property="og:description"
+        name="og:description"
         content="Vote for your favorite one piece characters"
       />
-      <meta property="og:image" content={imageUrl} />
+      <meta name="og:image" content={imageUrl} />
 
-      <meta property="twitter:card" content="summary_large_image" />
-      <meta property="twitter:url" content={link} />
-      <meta property="twitter:title" content={title} />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:url" content={link} />
+      <meta name="twitter:title" content={title} />
       <meta
-        property="twitter:description"
+        name="twitter:description"
         content="Vote for your favorite one piece characters"
       />
-      <meta property="twitter:image" content={imageUrl} />
+      <meta name="twitter:image" content={imageUrl} />
     </Head>
   );
 }
