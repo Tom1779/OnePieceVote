@@ -42,6 +42,7 @@ const RankingsPage = () => {
           .from("one_piece_characters")
           .select("*")
           .order("votes", { ascending: false })
+          .order("name", { ascending: true })
           .limit(3000);
 
         if (error) throw error;
