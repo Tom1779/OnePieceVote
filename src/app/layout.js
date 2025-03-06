@@ -2,7 +2,6 @@ import "./globals.css";
 import { AuthProvider } from "../contexts/auth-context";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
-import BrowserDetection from "./components/BrowserDetection";
 
 export const metadata = {
   title: "One Piece Character Voting",
@@ -34,7 +33,6 @@ export default function RootLayout({ children }) {
   return (
     <html>
       <body>
-        <BrowserDetection></BrowserDetection>
         <AuthProvider>{children}</AuthProvider>
         <SpeedInsights></SpeedInsights>
         <Analytics></Analytics>
