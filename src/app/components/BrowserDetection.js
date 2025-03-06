@@ -1,3 +1,5 @@
+"use client";
+
 // components/BrowserDetection.js
 import { useState, useEffect } from "react";
 
