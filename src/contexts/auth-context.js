@@ -49,7 +49,7 @@ export function AuthProvider({ children }) {
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
-            prompt: "select_account", // This is the key addition
+            prompt: "select_account", // Allows user to sign into account of their choosing instead of automatically signing into last used account
           },
         },
       });
