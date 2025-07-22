@@ -106,13 +106,11 @@ export default function Page() {
             {/* Logo and Title */}
             <div className="flex items-center space-x-2">
               {/* <Star className="text-yellow-500 h-4 w-4 sm:h-6 sm:w-6" /> */}
-              <div className="flex items-center justify-center h-4 w-4 sm:h-6 sm:w-6 flex-shrink-0">
-                <img
-                  src="/favicon.svg"
-                  alt="Logo"
-                  className="h-full w-full object-contain"
-                />
-              </div>
+              <img
+                src="/favicon.svg"
+                alt="Logo"
+                className="h-4 w-4 sm:h-6 sm:w-6 filter brightness-0 saturate-200 hue-rotate-[200deg]"
+              />
               <div className="text-xs sm:text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent truncate max-w-[120px] sm:max-w-none">
                 One Piece Character Voting
               </div>
