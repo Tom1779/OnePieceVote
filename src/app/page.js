@@ -107,9 +107,9 @@ export default function Page() {
             <div className="flex items-center space-x-2">
               {/* <Star className="text-yellow-500 h-4 w-4 sm:h-6 sm:w-6" /> */}
               <img
-                src="/favicon.svg"
+                src="/favicon-blue.svg"
                 alt="Logo"
-                className="h-4 w-4 sm:h-6 sm:w-6 fill-blue-400"
+                className="h-4 w-4 sm:h-6 sm:w-6"
               />
               <div className="text-xs sm:text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent truncate max-w-[120px] sm:max-w-none">
                 One Piece Character Voting
