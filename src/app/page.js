@@ -107,7 +107,7 @@ export default function Page() {
             <div className="flex items-center space-x-2">
               {/* <Star className="text-yellow-500 h-4 w-4 sm:h-6 sm:w-6" /> */}
               <img
-                src="/logo.svg"
+                src="/favicon.svg"
                 alt="Logo"
                 className="h-4 w-4 sm:h-6 sm:w-6"
               />
