@@ -145,8 +145,8 @@ const RankingsPage = () => {
                   <div className="font-medium text-sm sm:text-base text-gray-200 break-words min-w-0">
                     {character.name}
                   </div>
+                  <WikiLink url={character.wiki_url} />
                 </div>
-                <WikiLink url={character.wiki_url} />
                 <div className="w-16 sm:w-24 text-center text-blue-400 font-medium text-sm sm:text-base">
                   {character.votes.toLocaleString()}
                 </div>
