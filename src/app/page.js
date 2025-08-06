@@ -279,7 +279,7 @@ export default function Page() {
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-base sm:text-lg text-gray-200 break-words">
+                          <div className="font-semibold text-sm sm:text-lg text-gray-200 break-words">
                             {character.name}
                           </div>
                           <div className="text-xs sm:text-sm text-gray-400">
