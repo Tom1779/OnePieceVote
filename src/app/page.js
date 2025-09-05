@@ -77,25 +77,56 @@ export default function Page() {
         return;
       }
 
+      if (votesRemaining <= 0) {
+        alert("You've used all your votes for today!");
+        return;
+      }
+
+      // Optimistic updates first (immediate UI feedback)
+      updateLocalVote(characterId);
+      updateLocalVotesRemaining();
+
       startTransition(async () => {
         try {
           const result = await voteForCharacter(characterId);
-          if (result.success) {
-            // Update local state instead of reloading
-            updateLocalVote(characterId);
-            updateLocalVotesRemaining();
-            // Refresh top characters list
-            await fetchTopCharacters();
-          } else {
+          if (!result.success) {
+            // Revert optimistic updates on failure
+            setCharacters((prev) =>
+              prev.map((char) =>
+                char.id === characterId
+                  ? { ...char, votes: (char.votes || 0) - 1 }
+                  : char
+              )
+            );
             alert(result.error || "Failed to vote. Please try again.");
+          } else {
+            // Only refresh top characters every 5 votes to save API calls
+            if (Math.random() < 0.2) {
+              // 20% chance
+              await fetchTopCharacters();
+            }
           }
         } catch (error) {
           console.error("Voting error:", error);
+          // Revert optimistic updates
+          setCharacters((prev) =>
+            prev.map((char) =>
+              char.id === characterId
+                ? { ...char, votes: (char.votes || 0) - 1 }
+                : char
+            )
+          );
           alert("An unexpected error occurred. Please try again.");
         }
       });
     },
-    [user, updateLocalVote, updateLocalVotesRemaining, fetchTopCharacters]
+    [
+      user,
+      updateLocalVote,
+      updateLocalVotesRemaining,
+      fetchTopCharacters,
+      votesRemaining,
+    ]
   );
 
   return (
@@ -275,6 +306,7 @@ export default function Page() {
                             height={700}
                             style={{ objectFit: "contain" }}
                             unoptimized
+                            loading="lazy"
                             className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
                           />
                         </div>

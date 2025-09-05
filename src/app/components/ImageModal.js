@@ -104,6 +104,7 @@ export default function ImageModal({ src, alt, onClose }) {
           className="rounded-xl"
           onError={() => setImageError(true)}
           unoptimized
+          loading="lazy"
         />
         <button
           onClick={onClose}

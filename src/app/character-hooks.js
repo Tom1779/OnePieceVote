@@ -2,6 +2,34 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../contexts/auth-context";
 import { useAuth } from "../contexts/auth-context";
 
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+const getCachedCharacters = (searchQuery) => {
+  if (typeof window === "undefined") return null;
+  const cached = localStorage.getItem(`characters_${searchQuery}`);
+  if (!cached) return null;
+
+  const { data, timestamp } = JSON.parse(cached);
+  if (Date.now() - timestamp > CACHE_DURATION) {
+    localStorage.removeItem(`characters_${searchQuery}`);
+    return null;
+  }
+
+  return data;
+};
+
+const setCachedCharacters = (searchQuery, data) => {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(
+    `characters_${searchQuery}`,
+    JSON.stringify({
+      data,
+      timestamp: Date.now(),
+    })
+  );
+};
+
+// Replace the existing useCharacterSearch function with this:
 export function useCharacterSearch(searchQuery) {
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -13,16 +41,34 @@ export function useCharacterSearch(searchQuery) {
         setLoading(true);
         setError(null);
 
+        // Check cache first
+        if (searchQuery?.trim()) {
+          const cached = getCachedCharacters(searchQuery);
+          if (cached) {
+            setCharacters(cached);
+            setLoading(false);
+            return;
+          }
+        }
+
         let query = supabase.from("one_piece_characters").select("*");
 
         if (searchQuery?.trim()) {
-          query = query.ilike("name", `%${searchQuery}%`);
+          query = query.ilike("name", `%${searchQuery}%`).limit(25); // Added limit
+        } else {
+          query = query.limit(25); // Limit even empty searches
         }
 
         const { data, error: queryError } = await query.order("name");
 
         if (queryError) throw queryError;
+
         setCharacters(data || []);
+
+        // Cache the results
+        if (searchQuery?.trim()) {
+          setCachedCharacters(searchQuery, data || []);
+        }
       } catch (err) {
         console.error("Error fetching characters:", err);
         setError(err.message);
@@ -31,7 +77,8 @@ export function useCharacterSearch(searchQuery) {
       }
     };
 
-    const timeoutId = setTimeout(fetchCharacters, 300);
+    // Increased debounce from 300ms to 1000ms
+    const timeoutId = setTimeout(fetchCharacters, 1000);
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
 
