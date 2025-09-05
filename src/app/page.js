@@ -200,7 +200,7 @@ export default function Page() {
 
       <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         {/* Changed to single column on mobile */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 min-h-[calc(100vh-3.5rem)] py-4 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 min-h-[calc(100vh-3.5rem)] py-4 sm:py-8">
           {/* Voting Section */}
           <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700 flex flex-col h-full">
             <div className="p-4 sm:p-8">
