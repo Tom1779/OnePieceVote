@@ -293,7 +293,7 @@ export default function Page() {
                     {characters.map((character) => (
                       <div
                         key={character.id}
-                        className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-900/50 rounded-lg sm:rounded-xl border border-gray-700 hover:border-gray-600 transition-all duration-300"
+                        className="flex items-center gap-3 md:gap-4 p-3 md:p-4 bg-gray-900/50 rounded-lg md:rounded-xl border border-gray-700 hover:border-gray-600 transition-all duration-300"
                       >
                         <div
                           onClick={() => openModal(generateImageSrc(character))}
@@ -302,25 +302,20 @@ export default function Page() {
                           <Image
                             src={generateImageSrc(character)}
                             alt={character.name}
-                            width={700}
-                            height={700}
+                            width={64}
+                            height={64}
                             style={{ objectFit: "contain" }}
                             unoptimized
                             loading="lazy"
-                            className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
+                            className="w-12 h-12 md:w-16 md:h-16 rounded-full object-cover border-2 border-gray-700"
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div
-                            className="font-semibold text-gray-200 break-words"
-                            style={{
-                              fontSize: "clamp(0.7rem, 1.8vw, 1.125rem)", // 11px to 18px with faster scaling
-                              lineHeight: "1.2",
-                            }}
-                          >
+                          {/* Back to simple Tailwind classes - no clamp */}
+                          <div className="font-semibold text-xs md:text-lg text-gray-200 break-words">
                             {character.name}
                           </div>
-                          <div className="text-xs sm:text-sm text-gray-400">
+                          <div className="text-xs md:text-sm text-gray-400">
                             {character.votes || 0} votes
                           </div>
                         </div>
@@ -330,7 +325,7 @@ export default function Page() {
                             await sleep(100);
                             handleVote(character.id);
                           }}
-                          className={`flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-white text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
+                          className={`flex-shrink-0 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-white text-sm md:text-base font-medium transition-colors whitespace-nowrap ${
                             user && votesRemaining > 0
                               ? "bg-blue-600 hover:bg-blue-700"
                               : "bg-blue-600/50 cursor-not-allowed"
