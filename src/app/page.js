@@ -311,7 +311,13 @@ export default function Page() {
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-xs sm:text-lg text-gray-200 break-words">
+                          <div
+                            className="font-semibold text-gray-200 break-words"
+                            style={{
+                              fontSize: "clamp(0.75rem, 2.5vw, 1.125rem)", // 12px to 18px
+                              lineHeight: "1.3",
+                            }}
+                          >
                             {character.name}
                           </div>
                           <div className="text-xs sm:text-sm text-gray-400">
