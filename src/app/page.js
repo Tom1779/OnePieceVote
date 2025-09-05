@@ -314,8 +314,8 @@ export default function Page() {
                           <div
                             className="font-semibold text-gray-200 break-words"
                             style={{
-                              fontSize: "clamp(0.75rem, 2.5vw, 1.125rem)", // 12px to 18px
-                              lineHeight: "1.3",
+                              fontSize: "clamp(0.7rem, 1.8vw, 1.125rem)", // 11px to 18px with faster scaling
+                              lineHeight: "1.2",
                             }}
                           >
                             {character.name}
