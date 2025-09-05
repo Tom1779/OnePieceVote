@@ -289,11 +289,11 @@ export default function Page() {
                 ) : searchError ? (
                   <div className="text-red-400 text-center">{searchError}</div>
                 ) : characters.length > 0 ? (
-                  <div className="space-y-3 md:space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {characters.map((character) => (
                       <div
                         key={character.id}
-                        className="flex items-center gap-3 md:gap-4 p-3 md:p-4 bg-gray-900/50 rounded-lg md:rounded-xl border border-gray-700 hover:border-gray-600 transition-all duration-300"
+                        className="flex items-center gap-3 lg:gap-4 p-3 md:p-4 bg-gray-900/50 rounded-lg md:rounded-xl border border-gray-700 hover:border-gray-600 transition-all duration-300"
                       >
                         <div
                           onClick={() => openModal(generateImageSrc(character))}
