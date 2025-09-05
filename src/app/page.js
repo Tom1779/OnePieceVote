@@ -312,7 +312,7 @@ export default function Page() {
                         </div>
                         <div className="flex-1 min-w-0">
                           {/* Back to simple Tailwind classes - no clamp */}
-                          <div className="font-semibold text-xs md:text-lg text-gray-200 break-words">
+                          <div className="font-semibold text-xs md:text-md text-gray-200 break-words">
                             {character.name}
                           </div>
                           <div className="text-xs md:text-sm text-gray-400">
