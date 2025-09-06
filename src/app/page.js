@@ -311,7 +311,7 @@ export default function Page() {
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-xs sm:text-lg lg:text-sm xl:text-lg text-gray-200 break-words">
+                          <div className="font-semibold text-xs sm:text-lg lg:text-sm xl:text-lg text-gray-200 truncate">
                             {character.name}
                           </div>
                           <div className="text-xs sm:text-sm text-gray-400">
