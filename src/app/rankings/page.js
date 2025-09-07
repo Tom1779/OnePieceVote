@@ -60,7 +60,7 @@ const CharacterImage = ({ character, onClick }) => {
         alt={character.name}
         width={64}
         height={64}
-        className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
+        className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-contain border-2 border-gray-700"
         placeholder="blur"
         blurDataURL={shimmer}
         onError={() => setHasError(true)}
