@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import Head from "next/head";
@@ -103,7 +103,10 @@ const CharacterRow = ({ character, index, openModal }) => {
 };
 
 // Pagination component
+// Pagination component
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+  const [pageInput, setPageInput] = useState("");
+
   const getVisiblePages = () => {
     const delta = 2;
     const range = [];
@@ -134,44 +137,89 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     return rangeWithDots;
   };
 
-  return (
-    <div className="flex items-center justify-center gap-2 py-8">
-      <button
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage <= 1}
-        className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-      >
-        <ChevronLeft size={16} />
-        <span className="hidden sm:inline">Previous</span>
-      </button>
+  const handlePageInputSubmit = (e) => {
+    e.preventDefault();
+    const pageNum = parseInt(pageInput);
+    if (pageNum && pageNum >= 1 && pageNum <= totalPages) {
+      onPageChange(pageNum);
+      setPageInput("");
+    }
+  };
 
-      <div className="flex gap-1">
-        {getVisiblePages().map((page, index) => (
+  const handlePageInputChange = (e) => {
+    const value = e.target.value;
+    // Only allow numbers
+    if (value === "" || /^\d+$/.test(value)) {
+      setPageInput(value);
+    }
+  };
+
+  return (
+    <div className="space-y-4 py-8">
+      {/* Page Jump Input */}
+      <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
+        <span>Jump to page:</span>
+        <form
+          onSubmit={handlePageInputSubmit}
+          className="flex items-center gap-2"
+        >
+          <input
+            type="text"
+            value={pageInput}
+            onChange={handlePageInputChange}
+            placeholder={currentPage.toString()}
+            className="w-16 px-2 py-1 bg-gray-800 border border-gray-600 rounded text-white text-center focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            maxLength="3"
+          />
+          <span className="text-gray-500">of {totalPages}</span>
           <button
-            key={index}
-            onClick={() => typeof page === "number" && onPageChange(page)}
-            disabled={page === "..."}
-            className={`px-3 py-2 rounded-lg transition-colors ${
-              page === currentPage
-                ? "bg-blue-600 text-white"
-                : page === "..."
-                ? "text-gray-500 cursor-default"
-                : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-            }`}
+            type="submit"
+            className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition-colors"
           >
-            {page}
+            Go
           </button>
-        ))}
+        </form>
       </div>
 
-      <button
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage >= totalPages}
-        className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-      >
-        <span className="hidden sm:inline">Next</span>
-        <ChevronRight size={16} />
-      </button>
+      {/* Regular Pagination */}
+      <div className="flex items-center justify-center gap-2">
+        <button
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage <= 1}
+          className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <ChevronLeft size={16} />
+          <span className="hidden sm:inline">Previous</span>
+        </button>
+
+        <div className="flex gap-1">
+          {getVisiblePages().map((page, index) => (
+            <button
+              key={index}
+              onClick={() => typeof page === "number" && onPageChange(page)}
+              disabled={page === "..."}
+              className={`px-3 py-2 rounded-lg transition-colors ${
+                page === currentPage
+                  ? "bg-blue-600 text-white"
+                  : page === "..."
+                  ? "text-gray-500 cursor-default"
+                  : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+        </div>
+
+        <button
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage >= totalPages}
+          className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <span className="hidden sm:inline">Next</span>
+          <ChevronRight size={16} />
+        </button>
+      </div>
     </div>
   );
 };
