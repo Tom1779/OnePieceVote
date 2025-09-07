@@ -132,7 +132,7 @@ export default function Page() {
   return (
     <div className="min-h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       {/* Navigation Bar - Made more compact on mobile */}
-      <nav className="bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-700">
+      <nav className="bg-gray-900/80  sticky top-0 z-50 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
           <div className="flex justify-between h-14 sm:h-16 items-center">
             {/* Logo and Title */}
@@ -202,7 +202,7 @@ export default function Page() {
         {/* Changed to single column on mobile */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 min-h-[calc(100vh-3.5rem)] py-4 sm:py-8">
           {/* Voting Section */}
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700 flex flex-col h-full">
+          <div className="bg-gray-800/50  rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700 flex flex-col h-full">
             <div className="p-4 sm:p-8">
               <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-white">
                 Vote for Your Favorite Character
@@ -251,7 +251,7 @@ export default function Page() {
             </div>
 
             {/* Search Results */}
-            <div className="flex-1 mx-4 sm:mx-8 mb-4 sm:mb-8 border border-gray-700 rounded-xl p-3 sm:p-6 bg-gray-900/30 backdrop-blur-sm">
+            <div className="flex-1 mx-4 sm:mx-8 mb-4 sm:mb-8 border border-gray-700 rounded-xl p-3 sm:p-6 bg-gray-900/30 ">
               <div className="h-[600px] sm:h-[1104px] overflow-y-auto custom-scrollbar">
                 <style>
                   {`
@@ -351,7 +351,7 @@ export default function Page() {
           </div>
 
           {/* Top Characters Section */}
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700 flex flex-col h-full">
+          <div className="bg-gray-800/50 rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700 flex flex-col h-full">
             <div className="p-4 sm:p-8">
               <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <Trophy className="text-yellow-500" size={24} />
