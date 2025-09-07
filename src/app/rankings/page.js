@@ -64,13 +64,7 @@ const CharacterImage = ({ character, onClick }) => {
         placeholder="blur"
         blurDataURL={shimmer}
         onError={() => setHasError(true)}
-        priority={false}
-        style={{
-          width: "auto",
-          height: "auto",
-          maxWidth: "4rem",
-          maxHeight: "4rem",
-        }}
+        unoptimized
       />
     </div>
   );
