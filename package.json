@@ -14,9 +14,7 @@
     "lucide-react": "^0.460.0",
     "next": "latest",
     "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-virtualized-auto-sizer": "^1.0.26",
-    "react-window": "^1.8.10"
+    "react-dom": "18.2.0"
   },
   "engines": {
     "node": ">=18"

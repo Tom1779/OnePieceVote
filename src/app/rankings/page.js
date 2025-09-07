@@ -1,12 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import Head from "next/head";
 import Image from "next/image";
-import { FixedSizeList as List } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
 import { supabase } from "../../contexts/auth-context";
 import ImageModal from "../components/ImageModal";
 import WikiLink from "../components/WikiLink";
@@ -38,10 +36,7 @@ const CharacterImage = ({ character, onClick }) => {
     return `/characters/${character.name
       .toLowerCase()
       .replace(/ /g, "_")
-      .replace(
-        /[^a-zA-Z0-9ÁáÄäÂâÉéÈèÊêËëÍíÌìÏïÎîÓóÒòÖöÔôÚúÙùÜüÛûÇçÑñÀàÄäÂâÉéÈèÊêËëÍíÌìÏïÎîÓóÒòÖöÔôÚúÙùÜüÛûÇçÑñ_-]/g,
-        ""
-      )}.png`;
+      .replace(/[^\p{L}\p{N}_-]/gu, "")}.png`;
   };
 
   // Simple blur placeholder
@@ -62,7 +57,7 @@ const CharacterImage = ({ character, onClick }) => {
         alt={character.name}
         width={64}
         height={64}
-        className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-contain border-2 border-gray-700"
+        className="!w-12 !h-12 sm:!w-16 sm:!h-16 rounded-full object-contain border-2 border-gray-700"
         placeholder="blur"
         blurDataURL={shimmer}
         loading="lazy"
@@ -73,19 +68,10 @@ const CharacterImage = ({ character, onClick }) => {
   );
 };
 
-// Row renderer for react-window
-const ROW_HEIGHT = 100;
-
-const CharacterRow = ({ index, style, data }) => {
-  const character = data.characters[index];
-  const openModal = data.openModal;
-
+// Character row component
+const CharacterRow = ({ character, index, openModal }) => {
   return (
-    <div
-      key={character.id}
-      style={style}
-      className="grid grid-cols-[auto,1fr,auto] gap-2 sm:gap-4 p-3 sm:p-4 items-center hover:bg-gray-900/50 transition-all duration-300"
-    >
+    <div className="grid grid-cols-[auto,1fr,auto] gap-2 sm:gap-4 p-3 sm:p-4 items-center hover:bg-gray-900/50 transition-all duration-300 border-b border-gray-700 last:border-b-0">
       <div
         className={`w-12 sm:w-16 text-center font-bold text-sm sm:text-base ${
           index === 0
@@ -116,20 +102,94 @@ const CharacterRow = ({ index, style, data }) => {
   );
 };
 
+// Pagination component
+const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+  const getVisiblePages = () => {
+    const delta = 2;
+    const range = [];
+    const rangeWithDots = [];
+
+    for (
+      let i = Math.max(2, currentPage - delta);
+      i <= Math.min(totalPages - 1, currentPage + delta);
+      i++
+    ) {
+      range.push(i);
+    }
+
+    if (currentPage - delta > 2) {
+      rangeWithDots.push(1, "...");
+    } else {
+      rangeWithDots.push(1);
+    }
+
+    rangeWithDots.push(...range);
+
+    if (currentPage + delta < totalPages - 1) {
+      rangeWithDots.push("...", totalPages);
+    } else if (totalPages > 1) {
+      rangeWithDots.push(totalPages);
+    }
+
+    return rangeWithDots;
+  };
+
+  return (
+    <div className="flex items-center justify-center gap-2 py-8">
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage <= 1}
+        className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        <ChevronLeft size={16} />
+        <span className="hidden sm:inline">Previous</span>
+      </button>
+
+      <div className="flex gap-1">
+        {getVisiblePages().map((page, index) => (
+          <button
+            key={index}
+            onClick={() => typeof page === "number" && onPageChange(page)}
+            disabled={page === "..."}
+            className={`px-3 py-2 rounded-lg transition-colors ${
+              page === currentPage
+                ? "bg-blue-600 text-white"
+                : page === "..."
+                ? "text-gray-500 cursor-default"
+                : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+            }`}
+          >
+            {page}
+          </button>
+        ))}
+      </div>
+
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage >= totalPages}
+        className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        <span className="hidden sm:inline">Next</span>
+        <ChevronRight size={16} />
+      </button>
+    </div>
+  );
+};
+
 const RankingsPage = () => {
-  const [characters, setCharacters] = useState([]);
+  const [allCharacters, setAllCharacters] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+
+  const CHARACTERS_PER_PAGE = 50;
 
   const openModal = (character) => {
     const imageSrc = `/characters/${character.name
       .toLowerCase()
       .replace(/ /g, "_")
-      .replace(
-        /[^a-zA-Z0-9ÁáÄäÂâÉéÈèÊêËëÍíÌìÏïÎîÓóÒòÖöÔôÚúÙùÜüÛûÇçÑñÀàÄäÂâÉéÈèÊêËëÍíÌìÏïÎîÓóÒòÖöÔôÚúÙùÜüÛûÇçÑñ_-]/g,
-        ""
-      )}.png`;
+      .replace(/[^\p{L}\p{N}_-]/gu, "")}.png`;
     setSelectedImage(imageSrc);
   };
 
@@ -152,7 +212,7 @@ const RankingsPage = () => {
           new Map(data.map((char) => [char.id, char])).values()
         );
 
-        setCharacters(uniqueCharacters);
+        setAllCharacters(uniqueCharacters);
       } catch (err) {
         console.error("Error fetching rankings:", err);
         setError(err.message);
@@ -163,6 +223,17 @@ const RankingsPage = () => {
 
     fetchCharacters();
   }, []);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(allCharacters.length / CHARACTERS_PER_PAGE);
+  const startIndex = (currentPage - 1) * CHARACTERS_PER_PAGE;
+  const endIndex = startIndex + CHARACTERS_PER_PAGE;
+  const currentCharacters = allCharacters.slice(startIndex, endIndex);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // Layout wrapper
   const PageLayout = ({ children }) => (
@@ -212,7 +283,7 @@ const RankingsPage = () => {
                 Votes
               </div>
             </div>
-            <div className="divide-y divide-gray-700">
+            <div>
               {Array.from({ length: 15 }).map((_, i) => (
                 <SkeletonRow key={i} />
               ))}
@@ -261,30 +332,44 @@ const RankingsPage = () => {
       </Head>
 
       <PageLayout>
-        <div className="bg-gray-800/50 rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700 overflow-hidden">
-          <div className="grid grid-cols-[auto,1fr,auto] gap-2 sm:gap-4 p-3 sm:p-4 border-b border-gray-700 bg-gray-900/50 font-semibold text-sm sm:text-base">
-            <div className="w-12 sm:w-16 text-center text-gray-400">Rank</div>
-            <div className="text-gray-400">Character</div>
-            <div className="w-16 sm:w-24 text-center text-blue-400">Votes</div>
+        <div className="space-y-6">
+          {/* Stats */}
+          <div className="text-center text-gray-400">
+            Showing {startIndex + 1} -{" "}
+            {Math.min(endIndex, allCharacters.length)} of {allCharacters.length}{" "}
+            characters
           </div>
 
-          {/* Virtualized full-height list */}
-          <div className="h-[calc(100vh-12rem)]">
-            <AutoSizer>
-              {({ height, width }) => (
-                <List
-                  className="custom-scrollbar"
-                  height={height}
-                  width={width}
-                  itemCount={characters.length}
-                  itemSize={ROW_HEIGHT}
-                  itemData={{ characters, openModal }}
-                >
-                  {CharacterRow}
-                </List>
-              )}
-            </AutoSizer>
+          {/* Rankings Table */}
+          <div className="bg-gray-800/50 rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700 overflow-hidden">
+            <div className="grid grid-cols-[auto,1fr,auto] gap-2 sm:gap-4 p-3 sm:p-4 border-b border-gray-700 bg-gray-900/50 font-semibold text-sm sm:text-base">
+              <div className="w-12 sm:w-16 text-center text-gray-400">Rank</div>
+              <div className="text-gray-400">Character</div>
+              <div className="w-16 sm:w-24 text-center text-blue-400">
+                Votes
+              </div>
+            </div>
+
+            <div>
+              {currentCharacters.map((character, index) => (
+                <CharacterRow
+                  key={character.id}
+                  character={character}
+                  index={startIndex + index}
+                  openModal={openModal}
+                />
+              ))}
+            </div>
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
         </div>
       </PageLayout>
 
