@@ -7,6 +7,9 @@ import Script from "next/script";
 export const metadata = {
   title: "One Piece Character Voting",
   description: "Vote for your favorite One Piece characters",
+  alternates: {
+    canonical: "https://www.onepiecevoting.com/",
+  },
   icons: {
     icon: [
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
