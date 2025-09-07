@@ -8,6 +8,7 @@ import Image from "next/image";
 import { supabase } from "../../contexts/auth-context";
 import ImageModal from "../components/ImageModal";
 import WikiLink from "../components/WikiLink";
+import { FixedSizeList } from "react-window";
 
 // Skeleton component to prevent layout shift
 const SkeletonRow = () => (
@@ -66,6 +67,47 @@ const CharacterImage = ({ character, onClick }) => {
         onError={() => setHasError(true)}
         unoptimized
       />
+    </div>
+  );
+};
+
+// Row component for the virtualized list
+const CharacterRow = ({ index, style, data }) => {
+  const { characters, openModal } = data;
+  const character = characters[index];
+
+  const getRankColor = (rank) => {
+    if (rank === 0) return "text-yellow-500";
+    if (rank === 1) return "text-gray-400";
+    if (rank === 2) return "text-amber-600";
+    return "text-gray-500";
+  };
+
+  return (
+    <div
+      style={style}
+      className="grid grid-cols-[auto,1fr,auto] gap-2 sm:gap-4 p-3 sm:p-4 items-center hover:bg-gray-900/50 transition-all duration-300 border-b border-gray-700 last:border-b-0"
+    >
+      <div
+        className={`w-12 sm:w-16 text-center font-bold text-sm sm:text-base ${getRankColor(
+          index
+        )}`}
+      >
+        #{index + 1}
+      </div>
+      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+        <CharacterImage
+          character={character}
+          onClick={() => openModal(character)}
+        />
+        <div className="font-medium text-sm sm:text-base text-gray-200 break-words min-w-0">
+          {character.name}
+        </div>
+        <WikiLink url={character.wiki_url} />
+      </div>
+      <div className="w-16 sm:w-24 text-center text-blue-400 font-medium text-sm sm:text-base">
+        {character.votes.toLocaleString()}
+      </div>
     </div>
   );
 };
@@ -253,39 +295,15 @@ const RankingsPage = () => {
           </div>
 
           <div className="divide-y divide-gray-700">
-            {characters.map((character, index) => (
-              <div
-                key={character.id}
-                className="grid grid-cols-[auto,1fr,auto] gap-2 sm:gap-4 p-3 sm:p-4 items-center hover:bg-gray-900/50 transition-all duration-300"
-              >
-                <div
-                  className={`w-12 sm:w-16 text-center font-bold text-sm sm:text-base ${
-                    index === 0
-                      ? "text-yellow-500"
-                      : index === 1
-                      ? "text-gray-400"
-                      : index === 2
-                      ? "text-amber-600"
-                      : "text-gray-500"
-                  }`}
-                >
-                  #{index + 1}
-                </div>
-                <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-                  <CharacterImage
-                    character={character}
-                    onClick={() => openModal(character)}
-                  />
-                  <div className="font-medium text-sm sm:text-base text-gray-200 break-words min-w-0">
-                    {character.name}
-                  </div>
-                  <WikiLink url={character.wiki_url} />
-                </div>
-                <div className="w-16 sm:w-24 text-center text-blue-400 font-medium text-sm sm:text-base">
-                  {character.votes.toLocaleString()}
-                </div>
-              </div>
-            ))}
+            <FixedSizeList
+              height={500} // Adjust based on your desired container height
+              itemCount={characters.length}
+              itemSize={80} // Adjust to match the height of your character row
+              width="100%"
+              itemData={{ characters, openModal }}
+            >
+              {CharacterRow}
+            </FixedSizeList>
           </div>
         </div>
       </PageLayout>
