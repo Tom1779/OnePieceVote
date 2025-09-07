@@ -83,7 +83,7 @@ const RankingsPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-      <nav className="bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-700">
+      <nav className="bg-gray-900/80 sticky top-0 z-50 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex justify-between h-14 sm:h-16 items-center">
             <Link
@@ -101,7 +101,7 @@ const RankingsPage = () => {
       </nav>
 
       <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700 overflow-hidden">
+        <div className="bg-gray-800/50 rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700 overflow-hidden">
           <div className="grid grid-cols-[auto,1fr,auto] gap-2 sm:gap-4 p-3 sm:p-4 border-b border-gray-700 bg-gray-900/50 font-semibold text-sm sm:text-base">
             <div className="w-12 sm:w-16 text-center text-gray-400">Rank</div>
             <div className="text-gray-400">Character</div>
