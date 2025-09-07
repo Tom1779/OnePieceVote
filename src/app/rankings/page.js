@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Head from "next/head";
 import Image from "next/image";
+import { FixedSizeList as List } from "react-window";
+import AutoSizer from "react-virtualized-auto-sizer";
 import { supabase } from "../../contexts/auth-context";
 import ImageModal from "../components/ImageModal";
 import WikiLink from "../components/WikiLink";
@@ -63,9 +65,53 @@ const CharacterImage = ({ character, onClick }) => {
         className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-contain border-2 border-gray-700"
         placeholder="blur"
         blurDataURL={shimmer}
-        onError={() => setHasError(true)}
+        loading="lazy"
         unoptimized
+        onError={() => setHasError(true)}
       />
+    </div>
+  );
+};
+
+// Row renderer for react-window
+const ROW_HEIGHT = 100;
+
+const CharacterRow = ({ index, style, data }) => {
+  const character = data.characters[index];
+  const openModal = data.openModal;
+
+  return (
+    <div
+      key={character.id}
+      style={style}
+      className="grid grid-cols-[auto,1fr,auto] gap-2 sm:gap-4 p-3 sm:p-4 items-center hover:bg-gray-900/50 transition-all duration-300"
+    >
+      <div
+        className={`w-12 sm:w-16 text-center font-bold text-sm sm:text-base ${
+          index === 0
+            ? "text-yellow-500"
+            : index === 1
+            ? "text-gray-400"
+            : index === 2
+            ? "text-amber-600"
+            : "text-gray-500"
+        }`}
+      >
+        #{index + 1}
+      </div>
+      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+        <CharacterImage
+          character={character}
+          onClick={() => openModal(character)}
+        />
+        <div className="font-medium text-sm sm:text-base text-gray-200 break-words min-w-0">
+          {character.name}
+        </div>
+        <WikiLink url={character.wiki_url} />
+      </div>
+      <div className="w-16 sm:w-24 text-center text-blue-400 font-medium text-sm sm:text-base">
+        {character.votes.toLocaleString()}
+      </div>
     </div>
   );
 };
@@ -87,15 +133,12 @@ const RankingsPage = () => {
     setSelectedImage(imageSrc);
   };
 
-  const closeModal = () => {
-    setSelectedImage(null);
-  };
+  const closeModal = () => setSelectedImage(null);
 
   useEffect(() => {
     const fetchCharacters = async () => {
       try {
         setLoading(true);
-
         const { data, error } = await supabase
           .from("one_piece_characters")
           .select("*")
@@ -121,7 +164,7 @@ const RankingsPage = () => {
     fetchCharacters();
   }, []);
 
-  // Common layout structure to prevent shifts
+  // Layout wrapper
   const PageLayout = ({ children }) => (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
       <nav className="bg-gray-900/80 sticky top-0 z-50 border-b border-gray-700">
@@ -215,33 +258,6 @@ const RankingsPage = () => {
           content="View complete rankings of all One Piece characters based on community votes. See who ranks highest in the ultimate One Piece popularity contest!"
         />
         <link rel="canonical" href="https://www.onepiecevoting.com/rankings" />
-
-        {/* Open Graph tags */}
-        <meta
-          property="og:title"
-          content="One Piece Character Rankings - Top Voted Characters"
-        />
-        <meta
-          property="og:description"
-          content="View complete rankings of all One Piece characters based on community votes"
-        />
-        <meta
-          property="og:url"
-          content="https://www.onepiecevoting.com/rankings"
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="One Piece Voting" />
-
-        {/* Twitter Card tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta
-          name="twitter:title"
-          content="One Piece Character Rankings - Top Voted Characters"
-        />
-        <meta
-          name="twitter:description"
-          content="View complete rankings of all One Piece characters based on community votes"
-        />
       </Head>
 
       <PageLayout>
@@ -252,40 +268,22 @@ const RankingsPage = () => {
             <div className="w-16 sm:w-24 text-center text-blue-400">Votes</div>
           </div>
 
-          <div className="divide-y divide-gray-700">
-            {characters.map((character, index) => (
-              <div
-                key={character.id}
-                className="grid grid-cols-[auto,1fr,auto] gap-2 sm:gap-4 p-3 sm:p-4 items-center hover:bg-gray-900/50 transition-all duration-300"
-              >
-                <div
-                  className={`w-12 sm:w-16 text-center font-bold text-sm sm:text-base ${
-                    index === 0
-                      ? "text-yellow-500"
-                      : index === 1
-                      ? "text-gray-400"
-                      : index === 2
-                      ? "text-amber-600"
-                      : "text-gray-500"
-                  }`}
+          {/* Virtualized full-height list */}
+          <div className="h-[calc(100vh-12rem)]">
+            <AutoSizer>
+              {({ height, width }) => (
+                <List
+                  className="custom-scrollbar"
+                  height={height}
+                  width={width}
+                  itemCount={characters.length}
+                  itemSize={ROW_HEIGHT}
+                  itemData={{ characters, openModal }}
                 >
-                  #{index + 1}
-                </div>
-                <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-                  <CharacterImage
-                    character={character}
-                    onClick={() => openModal(character)}
-                  />
-                  <div className="font-medium text-sm sm:text-base text-gray-200 break-words min-w-0">
-                    {character.name}
-                  </div>
-                  <WikiLink url={character.wiki_url} />
-                </div>
-                <div className="w-16 sm:w-24 text-center text-blue-400 font-medium text-sm sm:text-base">
-                  {character.votes.toLocaleString()}
-                </div>
-              </div>
-            ))}
+                  {CharacterRow}
+                </List>
+              )}
+            </AutoSizer>
           </div>
         </div>
       </PageLayout>
