@@ -40,12 +40,5 @@ body {
 
 /* For Firefox */
 .custom-scrollbar {
-  scrollbar-width: thin;
   scrollbar-color: rgba(59, 130, 246, 0.5) rgba(31, 41, 55, 0.5);
 }
-
-/* html,
-body {
-  min-height: 100vh;
-  background: linear-gradient(to bottom left, #111827, #1f2937, #111827);
-} */
