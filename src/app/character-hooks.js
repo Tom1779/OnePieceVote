@@ -54,7 +54,7 @@ export function useCharacterSearch(searchQuery) {
         let query = supabase.from("one_piece_characters").select("*");
 
         if (searchQuery?.trim()) {
-          query = query.ilike("name", `%${searchQuery}%`).limit(50); // Added limit
+          query = query.ilike("name", `%${searchQuery}%`);
         } else {
           query = query.limit(25); // Limit even empty searches
         }
