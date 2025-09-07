@@ -1,3 +1,5 @@
+// Updated character-hooks.js with better vote handling
+
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../contexts/auth-context";
 import { useAuth } from "../contexts/auth-context";
@@ -29,7 +31,17 @@ const setCachedCharacters = (searchQuery, data) => {
   );
 };
 
-// Replace the existing useCharacterSearch function with this:
+// Clear cache when vote happens to prevent stale data
+const clearCacheForCharacter = (characterId) => {
+  if (typeof window === "undefined") return;
+  // Clear all character caches to prevent inconsistencies
+  Object.keys(localStorage).forEach((key) => {
+    if (key.startsWith("characters_")) {
+      localStorage.removeItem(key);
+    }
+  });
+};
+
 export function useCharacterSearch(searchQuery) {
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -56,7 +68,7 @@ export function useCharacterSearch(searchQuery) {
         if (searchQuery?.trim()) {
           query = query.ilike("name", `%${searchQuery}%`);
         } else {
-          query = query.limit(25); // Limit even empty searches
+          query = query.limit(25);
         }
 
         const { data, error: queryError } = await query.order("name");
@@ -77,22 +89,27 @@ export function useCharacterSearch(searchQuery) {
       }
     };
 
-    // Increased debounce from 300ms to 1000ms
     const timeoutId = setTimeout(fetchCharacters, 1000);
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
 
-  const updateLocalVote = useCallback((characterId) => {
+  // Updated to handle both increment and decrement
+  const updateLocalVote = useCallback((characterId, delta = 1) => {
     setCharacters((prev) =>
       prev.map((char) =>
         char.id === characterId
-          ? { ...char, votes: (char.votes || 0) + 1 }
+          ? { ...char, votes: Math.max(0, (char.votes || 0) + delta) }
           : char
       )
     );
+
+    // Clear cache when vote changes to prevent stale data
+    if (delta !== 0) {
+      clearCacheForCharacter(characterId);
+    }
   }, []);
 
-  return { characters, loading, error, updateLocalVote };
+  return { characters, loading, error, updateLocalVote, setCharacters };
 }
 
 export function useTopCharacters() {
@@ -125,17 +142,25 @@ export function useTopCharacters() {
     fetchTopCharacters();
   }, [fetchTopCharacters]);
 
-  const updateLocalVote = useCallback((characterId) => {
+  // Updated to handle both increment and decrement
+  const updateLocalVote = useCallback((characterId, delta = 1) => {
     setTopCharacters((prev) =>
       prev.map((char) =>
         char.id === characterId
-          ? { ...char, votes: (char.votes || 0) + 1 }
+          ? { ...char, votes: Math.max(0, (char.votes || 0) + delta) }
           : char
       )
     );
   }, []);
 
-  return { topCharacters, loading, error, updateLocalVote, fetchTopCharacters };
+  return {
+    topCharacters,
+    loading,
+    error,
+    updateLocalVote,
+    fetchTopCharacters,
+    setTopCharacters,
+  };
 }
 
 export function useVotesRemaining() {
@@ -163,7 +188,7 @@ export function useVotesRemaining() {
       setVotesRemaining(5 - (data?.vote_count || 0));
     } catch (err) {
       console.error("Error fetching votes remaining:", err);
-      setVotesRemaining(5); // Assume no votes if error
+      setVotesRemaining(5);
     } finally {
       setLoading(false);
     }
@@ -173,8 +198,8 @@ export function useVotesRemaining() {
     fetchVotesRemaining();
   }, [fetchVotesRemaining]);
 
-  const updateLocalVotesRemaining = useCallback(() => {
-    setVotesRemaining((prev) => Math.max(0, prev - 1));
+  const updateLocalVotesRemaining = useCallback((delta = -1) => {
+    setVotesRemaining((prev) => Math.max(0, prev + delta));
   }, []);
 
   return {
@@ -182,6 +207,7 @@ export function useVotesRemaining() {
     loading,
     fetchVotesRemaining,
     updateLocalVotesRemaining,
+    setVotesRemaining,
   };
 }
 

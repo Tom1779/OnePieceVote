@@ -40,12 +40,14 @@ export default function Page() {
     loading: topLoading,
     error: topError,
     fetchTopCharacters,
+    updateLocalVote: updateLocalVoteTop,
   } = useTopCharacters();
 
   const {
     votesRemaining,
     loading: votesLoading,
     updateLocalVotesRemaining,
+    setVotesRemaining,
   } = useVotesRemaining();
 
   const openModal = (image) => {
@@ -82,40 +84,31 @@ export default function Page() {
         return;
       }
 
-      // Optimistic updates first (immediate UI feedback)
-      updateLocalVote(characterId);
-      updateLocalVotesRemaining();
+      // Optimistic updates for BOTH lists
+      updateLocalVote(characterId, 1); // Updates search results
+      updateLocalVoteTop(characterId, 1); // Updates top characters
+      updateLocalVotesRemaining(-1); // Decrease votes remaining
 
       startTransition(async () => {
         try {
           const result = await voteForCharacter(characterId);
           if (!result.success) {
-            // Revert optimistic updates on failure
-            setCharacters((prev) =>
-              prev.map((char) =>
-                char.id === characterId
-                  ? { ...char, votes: (char.votes || 0) - 1 }
-                  : char
-              )
-            );
+            // Revert optimistic updates on BOTH lists
+            updateLocalVote(characterId, -1); // Subtract the vote back
+            updateLocalVoteTop(characterId, -1); // Subtract from top list too
+            setVotesRemaining((prev) => prev + 1); // Add vote back
             alert(result.error || "Failed to vote. Please try again.");
           } else {
-            // Only refresh top characters every 5 votes to save API calls
-            if (Math.random() < 0.2) {
-              // 20% chance
-              await fetchTopCharacters();
-            }
+            // Always refresh top characters after successful vote to ensure accuracy
+            // Remove the random chance - always refresh for consistency
+            await fetchTopCharacters();
           }
         } catch (error) {
           console.error("Voting error:", error);
-          // Revert optimistic updates
-          setCharacters((prev) =>
-            prev.map((char) =>
-              char.id === characterId
-                ? { ...char, votes: (char.votes || 0) - 1 }
-                : char
-            )
-          );
+          // Revert optimistic updates on both lists
+          updateLocalVote(characterId, -1);
+          updateLocalVoteTop(characterId, -1);
+          setVotesRemaining((prev) => prev + 1);
           alert("An unexpected error occurred. Please try again.");
         }
       });
@@ -123,9 +116,11 @@ export default function Page() {
     [
       user,
       updateLocalVote,
+      updateLocalVoteTop,
       updateLocalVotesRemaining,
       fetchTopCharacters,
       votesRemaining,
+      setVotesRemaining,
     ]
   );
 
