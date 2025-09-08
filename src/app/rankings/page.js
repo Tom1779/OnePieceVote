@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import Head from "next/head";
@@ -73,7 +73,7 @@ const CharacterRow = ({ character, index, openModal }) => {
   return (
     <div className="grid grid-cols-[auto,1fr,auto] gap-2 sm:gap-4 p-3 sm:p-4 items-center hover:bg-gray-900/50 transition-all duration-300 border-b border-gray-700 last:border-b-0">
       <div
-        className={`w-12 sm:w-16 text-center font-bold text-sm sm:text-base ${
+        className={`w-12 sm:w-16 text-center font-bold text-sm sm:text-base flex-shrink-0 ${
           index === 0
             ? "text-yellow-500"
             : index === 1
@@ -85,17 +85,21 @@ const CharacterRow = ({ character, index, openModal }) => {
       >
         #{index + 1}
       </div>
-      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+      <div className="flex items-center gap-2 sm:gap-4 min-w-0 overflow-hidden">
         <CharacterImage
           character={character}
           onClick={() => openModal(character)}
         />
-        <div className="font-medium text-sm sm:text-base text-gray-200 break-words min-w-0">
-          {character.name}
+        <div className="flex-1 min-w-0 overflow-hidden">
+          <div className="font-medium text-sm sm:text-base text-gray-200 break-words">
+            {character.name}
+          </div>
         </div>
-        <WikiLink url={character.wiki_url} />
+        <div className="flex-shrink-0 ml-auto">
+          <WikiLink url={character.wiki_url} />
+        </div>
       </div>
-      <div className="w-16 sm:w-24 text-center text-blue-400 font-medium text-sm sm:text-base">
+      <div className="w-16 sm:w-24 text-center text-blue-400 font-medium text-sm sm:text-base flex-shrink-0">
         {character.votes.toLocaleString()}
       </div>
     </div>
@@ -103,12 +107,13 @@ const CharacterRow = ({ character, index, openModal }) => {
 };
 
 // Pagination component
-// Pagination component
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const [pageInput, setPageInput] = useState("");
 
   const getVisiblePages = () => {
-    const delta = 2;
+    // Reduce delta on mobile for shorter pagination
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 640;
+    const delta = isMobile ? 1 : 2;
     const range = [];
     const rangeWithDots = [];
 
@@ -142,7 +147,11 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     const pageNum = parseInt(pageInput);
     if (pageNum && pageNum >= 1 && pageNum <= totalPages) {
       onPageChange(pageNum);
+      setPageInput(""); // Clear input after successful navigation
+    } else if (pageInput) {
+      // Also clear invalid input and show brief feedback
       setPageInput("");
+      // Optional: You could add a brief error message here
     }
   };
 
@@ -155,26 +164,28 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   };
 
   return (
-    <div className="space-y-4 py-8">
+    <div className="space-y-3 sm:space-y-4 py-4 sm:py-8">
       {/* Page Jump Input */}
-      <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
-        <span>Jump to page:</span>
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-xs sm:text-sm text-gray-400">
+        <span className="text-center">Jump to page:</span>
         <form
           onSubmit={handlePageInputSubmit}
-          className="flex items-center gap-2"
+          className="flex items-center gap-1 sm:gap-2"
         >
           <input
             type="text"
             value={pageInput}
             onChange={handlePageInputChange}
-            placeholder=""
-            className="w-16 px-2 py-1 bg-gray-800 border border-gray-600 rounded text-white text-center focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Page #"
+            className="w-14 sm:w-16 px-1 sm:px-2 py-1 bg-gray-800 border border-gray-600 rounded text-white text-center focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs sm:text-sm"
             maxLength="3"
           />
-          <span className="text-gray-500">of {totalPages}</span>
+          <span className="text-gray-500 text-xs sm:text-sm">
+            of {totalPages}
+          </span>
           <button
             type="submit"
-            className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition-colors"
+            className="px-2 sm:px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs sm:text-sm font-medium transition-colors"
           >
             Go
           </button>
@@ -182,23 +193,23 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
       </div>
 
       {/* Regular Pagination */}
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex items-center justify-center gap-1 sm:gap-2">
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
-          className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm"
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft size={14} className="sm:size-16" />
           <span className="hidden sm:inline">Previous</span>
         </button>
 
-        <div className="flex gap-1">
+        <div className="flex gap-0.5 sm:gap-1">
           {getVisiblePages().map((page, index) => (
             <button
               key={index}
               onClick={() => typeof page === "number" && onPageChange(page)}
               disabled={page === "..."}
-              className={`px-3 py-2 rounded-lg transition-colors ${
+              className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-colors text-xs sm:text-sm min-w-[32px] sm:min-w-[40px] ${
                 page === currentPage
                   ? "bg-blue-600 text-white"
                   : page === "..."
@@ -214,10 +225,10 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm"
         >
           <span className="hidden sm:inline">Next</span>
-          <ChevronRight size={16} />
+          <ChevronRight size={14} className="sm:size-16" />
         </button>
       </div>
     </div>
