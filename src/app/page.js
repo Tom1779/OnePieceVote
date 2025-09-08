@@ -172,7 +172,7 @@ export default function Page() {
                   onClick={signOut}
                   className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-red-800/50 text-red-400 hover:bg-red-700 transition-all duration-300 ease-in-out transform hover:scale-105"
                 >
-                  <LogOut size={14} className="sm:size-18" />
+                  <LogOut size={14} className="sm:size-4" />
                   <span className="text-[10px] sm:text-base font-medium">
                     Sign Out
                   </span>
@@ -182,7 +182,7 @@ export default function Page() {
                   onClick={signIn}
                   className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-blue-800/50 text-blue-400 hover:bg-blue-700 transition-all duration-300 ease-in-out transform hover:scale-105"
                 >
-                  <LogIn size={14} className="sm:size-18" />
+                  <LogIn size={14} className="sm:size-4" />
                   <span className="text-[10px] sm:text-base font-medium">
                     Sign In
                   </span>
