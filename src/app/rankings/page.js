@@ -199,7 +199,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
           disabled={currentPage <= 1}
           className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm"
         >
-          <ChevronLeft size={14} className="sm:size-16" />
+          <ChevronLeft size={14} className="sm:size-8" />
           <span className="hidden sm:inline">Previous</span>
         </button>
 
@@ -228,7 +228,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
           className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm"
         >
           <span className="hidden sm:inline">Next</span>
-          <ChevronRight size={14} className="sm:size-16" />
+          <ChevronRight size={14} className="sm:size-8" />
         </button>
       </div>
     </div>
