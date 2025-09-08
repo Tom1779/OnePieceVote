@@ -167,7 +167,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
             type="text"
             value={pageInput}
             onChange={handlePageInputChange}
-            placeholder={currentPage.toString()}
+            placeholder=""
             className="w-16 px-2 py-1 bg-gray-800 border border-gray-600 rounded text-white text-center focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             maxLength="3"
           />
