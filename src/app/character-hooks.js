@@ -63,15 +63,28 @@ export function useCharacterSearch(searchQuery) {
           }
         }
 
-        let query = supabase.from("one_piece_characters").select("*");
+        let data, queryError;
 
         if (searchQuery?.trim()) {
-          query = query.ilike("name", `%${searchQuery}%`);
-        } else {
-          query = query.limit(25);
-        }
+          // Use the new search function for ranked results
+          const result = await supabase.rpc("search_characters_ranked", {
+            search_term: searchQuery.trim(),
+            result_limit: 50,
+          });
 
-        const { data, error: queryError } = await query.order("name");
+          data = result.data;
+          queryError = result.error;
+        } else {
+          // Default query for when no search term
+          const result = await supabase
+            .from("one_piece_characters")
+            .select("*")
+            .order("name")
+            .limit(25);
+
+          data = result.data;
+          queryError = result.error;
+        }
 
         if (queryError) throw queryError;
 
