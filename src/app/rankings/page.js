@@ -95,7 +95,7 @@ const CharacterRow = ({ character, index, openModal }) => {
             {character.name}
           </div>
         </div>
-        <div className="flex-shrink-0 ml-auto">
+        <div className="flex-shrink-0 ml-auto" onClick={(e) => e.stopPropagation()}>
           <WikiLink url={character.wiki_url} />
         </div>
       </div>
