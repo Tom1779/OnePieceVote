@@ -63,10 +63,7 @@ export default function Page() {
     return `/characters/${character.name
       .toLowerCase()
       .replace(/ /g, "_")
-      .replace(
-        /[^a-zA-Z0-9áàäâéèêëíìïîóòöôúùüûçćñÁÀÄÂÉÈÊËÍÌÏÎÓÒÖÔÚÙÜÛÇĆÑ_-]/g,
-        ""
-      )}.png`;
+      .replace(/[^\p{L}\p{N}_-]/gu, "")}.png`;
   };
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
