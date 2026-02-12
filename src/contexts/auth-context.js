@@ -1,9 +1,8 @@
 // src/contexts/auth-context.js
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { useRouter } from "next/navigation";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -15,7 +14,7 @@ const AuthContext = createContext({});
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  const isRefreshing = useRef(false);
 
   useEffect(() => {
     // Check active session
@@ -32,15 +31,27 @@ export function AuthProvider({ children }) {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        router.refresh(); // Refresh the page to update data
+      
+      // Only clean URL on SIGNED_IN event, and only once
+      if (event === 'SIGNED_IN' && !isRefreshing.current) {
+        isRefreshing.current = true;
+        
+        // Clean the URL if there are hash fragments or query params
+        if (window.location.hash || window.location.search.includes('access_token')) {
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+        
+        // Reset the flag after a delay
+        setTimeout(() => {
+          isRefreshing.current = false;
+        }, 1000);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [router]);
+  }, []);
 
   const signIn = async () => {
     try {
@@ -49,7 +60,7 @@ export function AuthProvider({ children }) {
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
-            prompt: "select_account", // Allows user to sign into account of their choosing instead of automatically signing into last used account
+            prompt: "select_account",
           },
         },
       });
@@ -65,10 +76,10 @@ export function AuthProvider({ children }) {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
-      // Optionally reset session on Supabase client, just in case
-      await supabase.auth.setSession(null);
-
-      router.refresh();
+      setUser(null);
+      
+      // Clean reload to home
+      window.location.href = '/';
     } catch (error) {
       console.error("Error signing out:", error);
       throw error;
