@@ -2,13 +2,8 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr"; // Updated import
 import { useRouter } from "next/navigation";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
 
 const AuthContext = createContext({});
 
@@ -17,30 +12,32 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // Initialize the browser client
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
+
   useEffect(() => {
-    // Check active session
     const checkSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
       setLoading(false);
     };
 
     checkSession();
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        router.refresh(); // Refresh the page to update data
+      
+      // Critical: Only refresh on actual auth events to avoid 404 loops
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+        router.refresh();
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [router]);
+  }, [router, supabase]);
 
   const signIn = async () => {
     try {
@@ -48,9 +45,7 @@ export function AuthProvider({ children }) {
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            prompt: "select_account", // Allows user to sign into account of their choosing instead of automatically signing into last used account
-          },
+          queryParams: { prompt: "select_account" },
         },
       });
       if (error) throw error;
@@ -64,10 +59,6 @@ export function AuthProvider({ children }) {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-
-      // Optionally reset session on Supabase client, just in case
-      await supabase.auth.setSession(null);
-
       router.refresh();
     } catch (error) {
       console.error("Error signing out:", error);
@@ -89,5 +80,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-export { supabase };
