@@ -21,12 +21,14 @@ import {
 import { useAuth } from "../contexts/auth-context";
 import { useVotesRemaining } from "./character-hooks";
 import WikiLink from "./components/WikiLink";
+import { usePathname } from "next/navigation";
 
 export default function Page() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const [isPending, startTransition] = useTransition();
   const { user, signIn, signOut } = useAuth();
+  const pathname = usePathname();
 
   const {
     characters,
@@ -65,6 +67,10 @@ export default function Page() {
       .replace(/ /g, "_")
       .replace(/[^\p{L}\p{N}_-]/gu, "")}.png`;
   };
+
+  if (pathname !== "/") {
+    return null; 
+  }
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
