@@ -10,17 +10,17 @@ import {
   LogIn,
   LogOut,
 } from "lucide-react";
-import ImageModal from "./components/ImageModal";
+import ImageModal from "../components/ImageModal";
 import Link from "next/link";
 import Image from "next/image";
 import {
   useCharacterSearch,
   useTopCharacters,
   voteForCharacter,
-} from "./character-hooks";
-import { useAuth } from "../contexts/auth-context";
-import { useVotesRemaining } from "./character-hooks";
-import WikiLink from "./components/WikiLink";
+  useVotesRemaining
+} from "../character-hooks";
+import { useAuth } from "../../contexts/auth-context";
+import WikiLink from "../components/WikiLink";
 
 export default function HomeContent() {
   const [searchQuery, setSearchQuery] = useState("");
