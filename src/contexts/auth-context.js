@@ -4,7 +4,7 @@
 
 import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation"; // Add usePathname
-import { supabase } from "@/lib/supabase"; 
+import { supabase } from "@/lib/supabase";
 
 const AuthContext = createContext({});
 
@@ -16,32 +16,36 @@ export function AuthProvider({ children }) {
   const isRefreshing = useRef(false);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-  const newUser = session?.user ?? null;
+    // src/contexts/auth-context.js
 
-  setUser((prevUser) => {
-    const identityChanged = newUser?.id !== prevUser?.id;
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      const newUser = session?.user ?? null;
 
-    if (identityChanged && (event === 'SIGNED_IN' || event === 'SIGNED_OUT')) {
-      // 1. Get the current path safely
-      const path = window.location.pathname;
+      setUser((prevUser) => {
+        const identityChanged = newUser?.id !== prevUser?.id;
 
-      // 2. Define your "Safe" valid routes
-      const validRoutes = ['/', '/rankings', '/privacy', '/auth/callback'];
-      const isSafeRoute = validRoutes.includes(path);
+        if (identityChanged) {
+          // Only trigger a refresh if we are on a known valid page.
+          // This prevents the infinite loop on the 404 page.
+          const validRoutes = ["/", "/rankings", "/privacy"];
+          const currentPath = window.location.pathname;
+          const isSafeRoute = validRoutes.includes(currentPath);
 
-      if (isSafeRoute) {
-        // Only refresh if we are on a page that actually exists
-        setTimeout(() => router.refresh(), 0);
-      } else {
-        // If we are on a 404 or unknown path, force a redirect to home 
-        // instead of refreshing a broken URL
-        window.location.href = '/';
-      }
-    }
-    return newUser;
-  });
-});
+          if (
+            isSafeRoute &&
+            (event === "SIGNED_IN" || event === "SIGNED_OUT")
+          ) {
+            // Refresh valid pages to update server-side data (like votes remaining)
+            router.refresh();
+          }
+          // If it's NOT a safe route, we do NOTHING.
+          // This allows Next.js to stay on the 404 page without refreshing or redirecting.
+        }
+        return newUser;
+      });
+    });
 
     return () => subscription.unsubscribe();
   }, [router, pathname]); // Re-bind when pathname changes
