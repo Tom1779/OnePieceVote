@@ -10,31 +10,34 @@ export default function NotFound() {
   return (
     <main className="relative min-h-screen flex items-center justify-center overflow-hidden p-6">
       {/* 1. Background Map Layer */}
-      <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 -z-10 bg-[#e8dcc4]"> {/* Fallback color matches map */}
+        {/* Desktop 16:9 Map */}
         <div className="hidden md:block absolute inset-0">
           <Image
             src="/bg/404-map.png"
             alt="Desktop Map"
             fill
             priority
+            loading="eager"
             unoptimized
             className="object-fill"
           />
         </div>
+        {/* Mobile 9:16 Map */}
         <div className="block md:hidden absolute inset-0">
           <Image
             src="/bg/404-map-smaller.png" 
             alt="Mobile Map"
             fill
             priority
+            loading="eager"
             unoptimized
             className="object-fill"
           />
         </div>
-        <div className="absolute inset-0 bg-black/10" />
       </div>
 
-      {/* Top-Down Log Pose Compass - Gold Rim with Pewter/Sea-Glass Interior */}
+      {/* Top-Down Log Pose Compass */}
       <div className="absolute top-4 left-4 md:top-10 md:left-10 block opacity-90">
         <svg width="90" height="90" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="md:w-[150px] md:h-[150px]">
           {/* Outer Ring: Weathered Gold */}
@@ -53,7 +56,7 @@ export default function NotFound() {
             <circle cx="100" cy="100" r="45" fill="none" />
           </g>
 
-          {/* Markers: Darker Black for legibility */}
+          {/* Markers */}
           <g fontFamily="serif" fontWeight="900" fill="#000000" fontSize="24" textAnchor="middle">
             <text x="100" y="36">S</text>
             <text x="100" y="178">N</text>
