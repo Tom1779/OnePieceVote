@@ -12,33 +12,43 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    // Check active session on mount
-    const checkSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+  // src/contexts/auth-context.js
+
+useEffect(() => {
+  let mounted = true;
+
+  const checkSession = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (mounted) {
       setUser(session?.user ?? null);
       setLoading(false);
-    };
+    }
+  };
 
-    checkSession();
+  checkSession();
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const newUser = session?.user ?? null;
+    
+    // Check if the user ID has actually changed before doing anything
+    setUser((prevUser) => {
+      const isNewUser = newUser?.id !== prevUser?.id;
 
-      // FIX: Only refresh the router on actual login/logout events.
-      // This prevents the infinite loop on 404 pages.
-      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-        router.refresh();
+      if (isNewUser && (event === 'SIGNED_IN' || event === 'SIGNED_OUT')) {
+        // Only refresh if the identity actually flipped
+        // Use a small timeout to let state settle
+        setTimeout(() => router.refresh(), 0);
       }
+      
+      return newUser;
     });
+  });
 
-    return () => subscription.unsubscribe();
-  }, [router]);
+  return () => {
+    mounted = false;
+    subscription.unsubscribe();
+  };
+}, [router]);
 
   const signIn = async () => {
     try {
