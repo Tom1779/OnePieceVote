@@ -26,22 +26,20 @@ export function AuthProvider({ children }) {
       setUser((prevUser) => {
         const identityChanged = newUser?.id !== prevUser?.id;
 
-        if (identityChanged) {
-          // Only trigger a refresh if we are on a known valid page.
-          // This prevents the infinite loop on the 404 page.
-          const validRoutes = ["/", "/rankings", "/privacy"];
+        if (
+          identityChanged &&
+          (event === "SIGNED_IN" || event === "SIGNED_OUT")
+        ) {
+          // Check if we are on a known valid route
           const currentPath = window.location.pathname;
-          const isSafeRoute = validRoutes.includes(currentPath);
+          const validRoutes = ["/", "/rankings", "/privacy"];
 
-          if (
-            isSafeRoute &&
-            (event === "SIGNED_IN" || event === "SIGNED_OUT")
-          ) {
-            // Refresh valid pages to update server-side data (like votes remaining)
+          if (validRoutes.includes(currentPath)) {
+            // Only refresh valid pages to update RSC data
             router.refresh();
           }
-          // If it's NOT a safe route, we do NOTHING.
-          // This allows Next.js to stay on the 404 page without refreshing or redirecting.
+          // On any other path (404), do NOTHING.
+          // Do not redirect. Do not refresh. Just let not-found.js stay visible.
         }
         return newUser;
       });
