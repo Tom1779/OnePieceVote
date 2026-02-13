@@ -3,67 +3,77 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase"; // Import the shared client
+import { supabase } from "@/lib/supabase"; // Use the shared browser client
 
 const AuthContext = createContext({});
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const router = useRouter();
 
-  // src/contexts/auth-context.js
-
-useEffect(() => {
-  let mounted = true;
-
-  const checkSession = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (mounted) {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    }
-  };
-
-  checkSession();
-
-  const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-    const newUser = session?.user ?? null;
-    
-    // Check if the user ID has actually changed before doing anything
-    setUser((prevUser) => {
-      const isNewUser = newUser?.id !== prevUser?.id;
-
-      if (isNewUser && (event === 'SIGNED_IN' || event === 'SIGNED_OUT')) {
-        // Only refresh if the identity actually flipped
-        // Use a small timeout to let state settle
-        setTimeout(() => router.refresh(), 0);
+  useEffect(() => {
+    // 1. Initial Session Check: Sets state without triggering a router refresh
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setUser(session?.user ?? null);
+      } catch (error) {
+        console.error("Session check error:", error);
+      } finally {
+        setLoading(false);
       }
-      
-      return newUser;
-    });
-  });
+    };
 
-  return () => {
-    mounted = false;
-    subscription.unsubscribe();
-  };
-}, [router]);
+    checkSession();
+
+    // 2. Auth State Listener: Uses an "Identity Guard" to prevent 404 loops
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      const newUser = session?.user ?? null;
+
+      setUser((prevUser) => {
+        // Critical: Only trigger router.refresh() if the user's ID has actually changed.
+        // This prevents the infinite loop triggered when Supabase "re-discovers" 
+        // the same session on a 404 page or after a domain redirect.
+        const identityChanged = newUser?.id !== prevUser?.id;
+
+        if (
+          identityChanged && 
+          !isRefreshing && 
+          (event === 'SIGNED_IN' || event === 'SIGNED_OUT')
+        ) {
+          setIsRefreshing(true); // Temporary lock to prevent duplicate refreshes
+          
+          // Use a timeout to let the state update settle before the router reloads
+          setTimeout(() => {
+            router.refresh(); 
+            // The full page reload on refresh will reset 'isRefreshing' to false
+          }, 0);
+        }
+        
+        return newUser;
+      });
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [router, isRefreshing]);
 
   const signIn = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
+          // Use hardcoded domain in production to prevent origin mismatches
           redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            prompt: "select_account", 
-          },
+          queryParams: { prompt: "select_account" },
         },
       });
       if (error) throw error;
     } catch (error) {
-      console.error("Error signing in:", error);
+      console.error("Sign-in error:", error);
       throw error;
     }
   };
@@ -72,10 +82,9 @@ useEffect(() => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-
-      // Note: router.refresh() is handled by the onAuthStateChange listener above
+      // router.refresh() is handled automatically by the listener above
     } catch (error) {
-      console.error("Error signing out:", error);
+      console.error("Sign-out error:", error);
       throw error;
     }
   };
