@@ -30,16 +30,13 @@ export function AuthProvider({ children }) {
           identityChanged &&
           (event === "SIGNED_IN" || event === "SIGNED_OUT")
         ) {
-          // Check if we are on a known valid route
-          const currentPath = window.location.pathname;
+          // USE the pathname from the hook, not window.location
           const validRoutes = ["/", "/rankings", "/privacy"];
 
-          if (validRoutes.includes(currentPath)) {
-            // Only refresh valid pages to update RSC data
+          if (validRoutes.includes(pathname)) {
             router.refresh();
           }
-          // On any other path (404), do NOTHING.
-          // Do not redirect. Do not refresh. Just let not-found.js stay visible.
+          // STOP: Don't do anything else. No redirects, no refreshes.
         }
         return newUser;
       });
