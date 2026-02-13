@@ -1,7 +1,7 @@
 // Updated character-hooks.js with better vote handling
 
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "../contexts/auth-context";
+import { supabase } from "@/lib/supabase";
 import { useAuth } from "../contexts/auth-context";
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes

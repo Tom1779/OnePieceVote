@@ -2,8 +2,8 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { createBrowserClient } from "@supabase/ssr"; // Updated import
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase"; // Import the shared client
 
 const AuthContext = createContext({});
 
@@ -12,32 +12,33 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  // Initialize the browser client
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
-
   useEffect(() => {
+    // Check active session on mount
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
       setLoading(false);
     };
 
     checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
-      
-      // Critical: Only refresh on actual auth events to avoid 404 loops
+
+      // FIX: Only refresh the router on actual login/logout events.
+      // This prevents the infinite loop on 404 pages.
       if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
         router.refresh();
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [router, supabase]);
+  }, [router]);
 
   const signIn = async () => {
     try {
@@ -45,7 +46,9 @@ export function AuthProvider({ children }) {
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: { prompt: "select_account" },
+          queryParams: {
+            prompt: "select_account", 
+          },
         },
       });
       if (error) throw error;
@@ -59,7 +62,8 @@ export function AuthProvider({ children }) {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      router.refresh();
+
+      // Note: router.refresh() is handled by the onAuthStateChange listener above
     } catch (error) {
       console.error("Error signing out:", error);
       throw error;
