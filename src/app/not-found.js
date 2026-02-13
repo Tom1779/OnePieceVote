@@ -48,7 +48,7 @@ export default function NotFound() {
 
         <p className="text-[#4A3D33] mb-8 text-lg font-medium">
           You've sailed into uncharted waters. This island isn't on the Grand
-          Line or our map.
+          Line or the 4 blues.
         </p>
 
         <Link
