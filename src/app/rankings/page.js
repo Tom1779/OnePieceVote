@@ -5,7 +5,7 @@ import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import Head from "next/head";
 import Image from "next/image";
-import { supabase } from "../../contexts/auth-context";
+import { supabase } from "@/lib/supabase";
 import ImageModal from "../components/ImageModal";
 import WikiLink from "../components/WikiLink";
 
