@@ -17,30 +17,31 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      const newUser = session?.user ?? null;
+  const newUser = session?.user ?? null;
 
-      setUser((prevUser) => {
-        const identityChanged = newUser?.id !== prevUser?.id;
+  setUser((prevUser) => {
+    const identityChanged = newUser?.id !== prevUser?.id;
 
-        // CRITICAL: Block refresh on invalid paths or if identity hasn't changed
-        if (identityChanged && !isRefreshing.current) {
-          if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-            
-            // Check if we are currently on a known valid route
-            // Next.js triggers 404s for any route not matched.
-            // If the current path isn't '/' or another valid page, skip the refresh.
-            const isInvalidPath = pathname === null || pathname.includes('not-found');
+    if (identityChanged && (event === 'SIGNED_IN' || event === 'SIGNED_OUT')) {
+      // 1. Get the current path safely
+      const path = window.location.pathname;
 
-            if (!isInvalidPath) {
-              isRefreshing.current = true;
-              router.refresh();
-              setTimeout(() => { isRefreshing.current = false; }, 2000);
-            }
-          }
-        }
-        return newUser;
-      });
-    });
+      // 2. Define your "Safe" valid routes
+      const validRoutes = ['/', '/rankings', '/privacy', '/auth/callback'];
+      const isSafeRoute = validRoutes.includes(path);
+
+      if (isSafeRoute) {
+        // Only refresh if we are on a page that actually exists
+        setTimeout(() => router.refresh(), 0);
+      } else {
+        // If we are on a 404 or unknown path, force a redirect to home 
+        // instead of refreshing a broken URL
+        window.location.href = '/';
+      }
+    }
+    return newUser;
+  });
+});
 
     return () => subscription.unsubscribe();
   }, [router, pathname]); // Re-bind when pathname changes

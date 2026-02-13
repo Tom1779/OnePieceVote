@@ -30,8 +30,11 @@ export async function GET(request) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
-    }
+  // Use your actual domain to ensure cookies are set on the correct host
+  const isProd = process.env.NODE_ENV === 'production';
+  const targetHost = isProd ? 'https://www.onepiecevoting.com' : origin;
+  return NextResponse.redirect(`${targetHost}${next}`);
+}
   }
 
   // Return the user to an error page with instructions if exchange fails
