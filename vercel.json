@@ -1,1 +1,13 @@
-{ "rewrites": [{ "source": "/(.*)", "destination": "/" }] }
+{
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/auth/(.*)",
+      "destination": "/auth/$1"
+    },
+    {
+      "source": "/((?!api/|auth/|_next/|static/|[\\w-]+\\.\\w+).*)",
+      "destination": "/"
+    }
+  ]
+}
