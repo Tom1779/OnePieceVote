@@ -27,7 +27,7 @@ const setCachedCharacters = (searchQuery, data) => {
     JSON.stringify({
       data,
       timestamp: Date.now(),
-    })
+    }),
   );
 };
 
@@ -112,8 +112,8 @@ export function useCharacterSearch(searchQuery) {
       prev.map((char) =>
         char.id === characterId
           ? { ...char, votes: Math.max(0, (char.votes || 0) + delta) }
-          : char
-      )
+          : char,
+      ),
     );
 
     // Clear cache when vote changes to prevent stale data
@@ -139,6 +139,7 @@ export function useTopCharacters() {
         .from("one_piece_characters")
         .select("*")
         .order("votes", { ascending: false })
+        .order("name", { ascending: true }) // tiebreaker
         .limit(10);
 
       if (queryError) throw queryError;
@@ -161,8 +162,8 @@ export function useTopCharacters() {
       prev.map((char) =>
         char.id === characterId
           ? { ...char, votes: Math.max(0, (char.votes || 0) + delta) }
-          : char
-      )
+          : char,
+      ),
     );
   }, []);
 
