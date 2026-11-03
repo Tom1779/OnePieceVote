@@ -1,8 +1,9 @@
 "use client";
 
-import { Shield, ArrowLeft } from "lucide-react";
+import { Shield } from "lucide-react";
 import Link from "next/link";
 import Head from "next/head";
+import PageShell from "../components/PageShell";
 
 export default function PrivacyPage() {
   return (
@@ -23,36 +24,19 @@ export default function PrivacyPage() {
           content="https://www.onepiecevoting.com/privacy"
         />
       </Head>
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-        <nav className="bg-gray-900/80 sticky top-0 z-50 border-b border-gray-700">
-          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-14 sm:h-16 items-center">
-              <Link
-                href="/"
-                className="flex items-center gap-1 sm:gap-2 text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                <ArrowLeft size={18} />
-                <span className="text-sm sm:text-base">Back to Voting</span>
-              </Link>
-              <div className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Privacy
-              </div>
-            </div>
-          </div>
-        </nav>
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-          <div className="bg-gray-800/50 rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700 overflow-hidden">
-            <div className="p-6 sm:p-8">
+      <PageShell wide={false}>
+          <div className="paper">
+            <div className="p-6 sm:p-10">
               <div className="flex items-center gap-3 mb-6">
-                <Shield className="text-blue-400 h-8 w-8" />
-                <h1 className="text-2xl sm:text-3xl font-bold text-white">
+                <Shield className="text-blood h-8 w-8" />
+                <h1 className="font-display text-3xl sm:text-4xl">
                   Privacy Policy
                 </h1>
               </div>
 
-              <div className="space-y-6 text-gray-300">
+              <div className="space-y-6 text-lg text-ink-soft">
                 <section>
-                  <h2 className="text-xl font-semibold text-white mb-3">
+                  <h2 className="font-display text-2xl text-ink mb-3">
                     Information We Collect
                   </h2>
                   <p className="mb-3">
@@ -80,7 +64,7 @@ export default function PrivacyPage() {
                     <li>
                       This project uses{" "}
                       <Link
-                        className="text-blue-200"
+                        className="font-bold text-blood underline"
                         href="https://supabase.com/docs"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -94,7 +78,7 @@ export default function PrivacyPage() {
                 </section>
 
                 <section>
-                  <h2 className="text-xl font-semibold text-white mb-3">
+                  <h2 className="font-display text-2xl text-ink mb-3">
                     How We Use Your Information
                   </h2>
                   <p className="mb-3">We use your information to:</p>
@@ -112,7 +96,7 @@ export default function PrivacyPage() {
                 </section>
 
                 <section>
-                  <h2 className="text-xl font-semibold text-white mb-3">
+                  <h2 className="font-display text-2xl text-ink mb-3">
                     Data Security
                   </h2>
                   <p className="mb-3">
@@ -135,7 +119,7 @@ export default function PrivacyPage() {
                 </section>
 
                 <section>
-                  <h2 className="text-xl font-semibold text-white mb-3">
+                  <h2 className="font-display text-2xl text-ink mb-3">
                     As we would prefer to not be contacted with questions, we
                     made it so every account has all of its information deleted
                     after 7 days of not being signed in. So there will be no
@@ -144,13 +128,13 @@ export default function PrivacyPage() {
                 </section>
 
                 <section>
-                  <h2 className="text-xl font-semibold text-white mb-3">
+                  <h2 className="font-display text-2xl text-ink mb-3">
                     Special Thanks
                   </h2>
                   <p className="mb-3">
                     All character data was collected from the{" "}
                     <Link
-                      className="text-blue-200"
+                      className="font-bold text-blood underline"
                       href="https://onepiece.fandom.com/"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -160,16 +144,15 @@ export default function PrivacyPage() {
                   </p>
                 </section>
 
-                <section className="pt-4 border-t border-gray-700">
-                  <p className="text-sm text-gray-400">
+                <section className="pt-4 border-t border-ink/20">
+                  <p className="text-sm text-ink-faint">
                     Last updated: {new Date().toLocaleDateString()}
                   </p>
                 </section>
               </div>
             </div>
           </div>
-        </main>
-      </div>
+      </PageShell>
     </>
   );
 }

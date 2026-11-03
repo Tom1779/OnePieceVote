@@ -1,18 +1,11 @@
 "use client";
 
-import { useState, useCallback, useTransition } from "react";
-import {
-  Search,
-  List,
-  Star,
-  Trophy,
-  Shield,
-  LogIn,
-  LogOut,
-} from "lucide-react";
+import { useState, useCallback, useEffect, useTransition } from "react";
+import { Search, Trophy, LogIn } from "lucide-react";
 import ImageModal from "../components/ImageModal";
-import Link from "next/link";
-import Image from "next/image";
+import PageShell from "../components/PageShell";
+import WantedPoster, { Bounty } from "../components/WantedPoster";
+import CharacterImage from "../components/CharacterImage";
 import {
   useCharacterSearch,
   useTopCharacters,
@@ -20,13 +13,101 @@ import {
   useVotesRemaining
 } from "../character-hooks";
 import { useAuth } from "../../contexts/auth-context";
-import WikiLink from "../components/WikiLink";
+import { generateImageSrc } from "@/lib/character-image";
+
+const DAILY_VOTES = 5;
+const RANK_COLORS = ["text-brass", "text-paper-dark", "text-[#c27a3e]"];
+
+function Toast({ toast, onDone }) {
+  useEffect(() => {
+    if (!toast) return;
+    const id = setTimeout(onDone, 2800);
+    return () => clearTimeout(id);
+  }, [toast, onDone]);
+
+  if (!toast) return null;
+
+  return (
+    <div
+      key={toast.id}
+      role="status"
+      className={`paper fixed bottom-24 left-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 animate-toast-in px-4 py-3 text-center font-bold sm:bottom-8 ${
+        toast.tone === "error" ? "text-blood" : "text-ink"
+      }`}
+    >
+      {toast.message}
+    </div>
+  );
+}
+
+function VotePips({ remaining, loading }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-sm font-bold uppercase tracking-wider text-paper-dark">
+        Votes left today
+      </span>
+      <div className="flex gap-1.5" aria-label={`${remaining} of ${DAILY_VOTES} votes left`}>
+        {Array.from({ length: DAILY_VOTES }).map((_, i) => (
+          <span
+            key={i}
+            className={`h-3.5 w-3.5 rounded-full border border-brass ${
+              loading ? "animate-pulse" : i < remaining ? "bg-brass" : "bg-transparent"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MostWanted({ characters, onImageClick }) {
+  return (
+    <section className="lg:sticky lg:top-24">
+      <div className="mb-3 flex items-center gap-2">
+        <Trophy className="text-brass" size={22} />
+        <h2 className="font-display text-2xl text-paper">Most Wanted</h2>
+      </div>
+      <ol className="custom-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-3 lg:mx-0 lg:flex-col lg:gap-2 lg:overflow-visible lg:px-0 lg:pb-0">
+        {characters.map((character, index) => (
+          <li
+            key={character.id}
+            className="paper relative flex w-32 shrink-0 snap-start flex-col items-center gap-2 p-2 lg:w-auto lg:flex-row lg:gap-3"
+          >
+            <span
+              className={`absolute left-1 top-1 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-ink font-display text-sm shadow lg:static lg:shrink-0 lg:text-base ${
+                RANK_COLORS[index] ?? "text-paper-dark"
+              }`}
+            >
+              {index + 1}
+            </span>
+            <button
+              type="button"
+              onClick={() => onImageClick(character)}
+              className="block w-full border-2 border-ink/80 lg:w-12 lg:shrink-0"
+              aria-label={`View ${character.name} full size`}
+            >
+              <CharacterImage character={character} sizes={120} className="aspect-[3/4] w-full" />
+            </button>
+            <div className="min-w-0 text-center lg:flex-1 lg:text-left">
+              <div className="truncate text-sm font-extrabold uppercase leading-tight lg:text-base">
+                {character.name}
+              </div>
+              <Bounty votes={character.votes} className="text-sm lg:justify-start lg:text-base" />
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
 
 export default function HomeContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [lastVotedId, setLastVotedId] = useState(null);
   const [isPending, startTransition] = useTransition();
-  const { user, signIn, signOut } = useAuth();
+  const { user, signIn } = useAuth();
 
   const {
     characters,
@@ -37,8 +118,6 @@ export default function HomeContent() {
 
   const {
     topCharacters,
-    loading: topLoading,
-    error: topError,
     fetchTopCharacters,
     updateLocalVote: updateLocalVoteTop,
   } = useTopCharacters();
@@ -50,34 +129,31 @@ export default function HomeContent() {
     setVotesRemaining,
   } = useVotesRemaining();
 
-  const openModal = (image) => {
-    setSelectedImage(image);
+  const openModal = (character) => {
+    setSelectedImage(generateImageSrc(character));
   };
 
   const closeModal = () => {
     setSelectedImage(null);
   };
 
-  // Utility function to generate image src based on character name
-  const generateImageSrc = (character) => {
-    return `/characters/${character.name
-      .toLowerCase()
-      .replace(/ /g, "_")
-      .replace(/[^\p{L}\p{N}_-]/gu, "")}.png`;
-  };
+  const showToast = useCallback((message, tone = "info") => {
+    setToast({ id: Date.now(), message, tone });
+  }, []);
+  const clearToast = useCallback(() => setToast(null), []);
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const handleVote = useCallback(
-    async (characterId) => {
-      console.log("Current user in handleVote:", user);
+    async (character) => {
+      const characterId = character.id;
       if (!user) {
-        alert("Please sign in to vote!");
+        showToast("Sign in to vote!", "error");
         return;
       }
 
       if (votesRemaining <= 0) {
-        alert("You've used all your votes for today!");
+        showToast("You've used all your votes for today!", "error");
         return;
       }
 
@@ -85,6 +161,7 @@ export default function HomeContent() {
       updateLocalVote(characterId, 1); // Updates search results
       updateLocalVoteTop(characterId, 1); // Updates top characters
       updateLocalVotesRemaining(-1); // Decrease votes remaining
+      setLastVotedId(characterId);
 
       startTransition(async () => {
         try {
@@ -94,10 +171,10 @@ export default function HomeContent() {
             updateLocalVote(characterId, -1); // Subtract the vote back
             updateLocalVoteTop(characterId, -1); // Subtract from top list too
             setVotesRemaining((prev) => prev + 1); // Add vote back
-            alert(result.error || "Failed to vote. Please try again.");
+            showToast(result.error || "Failed to vote. Please try again.", "error");
           } else {
+            showToast(`Bounty raised on ${character.name}!`);
             // Always refresh top characters after successful vote to ensure accuracy
-            // Remove the random chance - always refresh for consistency
             await fetchTopCharacters();
           }
         } catch (error) {
@@ -106,7 +183,7 @@ export default function HomeContent() {
           updateLocalVote(characterId, -1);
           updateLocalVoteTop(characterId, -1);
           setVotesRemaining((prev) => prev + 1);
-          alert("An unexpected error occurred. Please try again.");
+          showToast("An unexpected error occurred. Please try again.", "error");
         }
       });
     },
@@ -118,272 +195,103 @@ export default function HomeContent() {
       fetchTopCharacters,
       votesRemaining,
       setVotesRemaining,
+      showToast,
     ],
   );
 
+  const canVote = user && votesRemaining > 0;
+
   return (
-    <div className="min-h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Navigation Bar - Made more compact on mobile */}
-      <nav className="bg-gray-900/80  sticky top-0 z-50 border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-14 sm:h-16 items-center">
-            {/* Logo and Title */}
-            <div className="flex items-center space-x-2">
-              {/* <Star className="text-yellow-500 h-4 w-4 sm:h-6 sm:w-6" /> */}
-              <img
-                src="/favicon-blue.svg"
-                alt="Logo"
-                className="h-6 w-6 sm:h-8 sm:w-8"
-              />
-              <div className="text-xs sm:text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent truncate max-w-[120px] sm:max-w-none">
-                One Piece Character Voting
-              </div>
-            </div>
+    <PageShell>
+      <header className="mb-6 sm:mb-10">
+        <h1 className="font-display text-3xl leading-tight text-paper sm:text-5xl">
+          Who&apos;s the most wanted?
+        </h1>
+        <p className="mt-2 max-w-2xl text-lg text-paper-dark/80">
+          Every vote raises a character&apos;s bounty. Find your favorite and
+          put a price on their head.
+        </p>
 
-            {/* Navigation Items */}
-            <div className="flex items-center space-x-1 sm:space-x-4">
-              <Link
-                href="/rankings"
-                className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gray-800/50 text-blue-400 hover:bg-gray-700 transition-all duration-300 ease-in-out transform hover:scale-105"
-              >
-                <List size={14} className="sm:hidden" />
-                <Trophy size={16} className="hidden sm:block" />
-                <span className="text-[10px] sm:text-base font-medium">
-                  Rankings
+        <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <label className="relative block w-full sm:max-w-md">
+            <span className="sr-only">Search characters</span>
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint"
+              size={20}
+            />
+            <input
+              type="text"
+              placeholder="Search for a character..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="paper w-full rounded-sm py-3 pl-11 pr-4 text-lg placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-brass"
+            />
+          </label>
+
+          {user ? (
+            <div className="flex flex-col gap-1">
+              <VotePips remaining={votesRemaining} loading={votesLoading} />
+              {!votesLoading && votesRemaining === 0 && (
+                <span className="text-sm text-paper-dark/70">
+                  Daily limit reached. Come back tomorrow!
                 </span>
-              </Link>
-
-              <Link
-                href="/privacy"
-                className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gray-800/50 text-blue-400 hover:bg-gray-700 transition-all duration-300 ease-in-out transform hover:scale-105"
-              >
-                <List size={14} className="sm:hidden" />
-                <Shield size={16} className="hidden sm:block" />
-                <span className="text-[10px] sm:text-base font-medium">
-                  Privacy
-                </span>
-              </Link>
-
-              {user ? (
-                <button
-                  onClick={signOut}
-                  className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-red-800/50 text-red-400 hover:bg-red-700 transition-all duration-300 ease-in-out transform hover:scale-105"
-                >
-                  <LogOut size={14} className="sm:size-4" />
-                  <span className="text-[10px] sm:text-base font-medium">
-                    Sign Out
-                  </span>
-                </button>
-              ) : (
-                <button
-                  onClick={signIn}
-                  className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-blue-800/50 text-blue-400 hover:bg-blue-700 transition-all duration-300 ease-in-out transform hover:scale-105"
-                >
-                  <LogIn size={14} className="sm:size-4" />
-                  <span className="text-[10px] sm:text-base font-medium">
-                    Sign In
-                  </span>
-                </button>
               )}
             </div>
-          </div>
+          ) : (
+            <button
+              onClick={signIn}
+              className="inline-flex items-center gap-2 self-start text-left font-bold text-brass hover:underline sm:self-auto"
+            >
+              <LogIn size={18} />
+              Sign in to cast your {DAILY_VOTES} daily votes
+            </button>
+          )}
         </div>
-      </nav>
+      </header>
 
-      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        {/* Changed to single column on mobile */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 min-h-[calc(100vh-3.5rem)] py-4 sm:py-8">
-          {/* Voting Section */}
-          <div className="bg-gray-800/50  rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700 flex flex-col h-full">
-            <div className="p-4 sm:p-8">
-              <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-white">
-                Vote for Your Favorite Character
-              </h2>
+      <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start lg:gap-10">
+        <aside className="lg:order-2">
+          <MostWanted characters={topCharacters} onImageClick={openModal} />
+        </aside>
 
-              <div className="relative mb-4 sm:mb-6">
-                <input
-                  type="text"
-                  placeholder="Search characters..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full p-3 sm:p-4 pl-10 sm:pl-12 bg-gray-900/50 border border-gray-700 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 text-sm sm:text-base"
-                />
-                <Search
-                  className="absolute left-3 sm:left-4 top-3 sm:top-4 text-gray-400"
-                  size={18}
-                />
-              </div>
-              {!user ? (
-                <div className="text-center text-yellow-400 mb-4">
-                  Please sign in to vote for characters!
-                </div>
-              ) : (
-                <div className="flex items-center justify-between px-4 py-2 bg-gray-900/50 rounded-lg mb-4">
-                  <div className="text-gray-300">
-                    Votes remaining today:
-                    {votesLoading ? (
-                      <span className="ml-2 animate-pulse">Loading...</span>
-                    ) : (
-                      <span
-                        className={`ml-2 font-bold ${
-                          votesRemaining > 0 ? "text-green-400" : "text-red-400"
-                        }`}
-                      >
-                        {votesRemaining}
-                      </span>
-                    )}
-                  </div>
-                  {votesRemaining === 0 && (
-                    <div className="text-red-400 text-sm">
-                      Daily limit reached! Come back tomorrow.
-                    </div>
-                  )}
-                </div>
-              )}
+        <section className="lg:order-1" aria-live="polite">
+          {searchLoading ? (
+            <div className="flex justify-center py-24">
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-brass border-t-transparent" />
             </div>
-
-            {/* Search Results */}
-            <div className="flex-1 mx-4 sm:mx-8 mb-4 sm:mb-8 border border-gray-700 rounded-xl p-3 sm:p-6 bg-gray-900/30 ">
-              <div className="h-[600px] sm:h-[1104px] overflow-y-auto custom-scrollbar">
-                {searchLoading ? (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                  </div>
-                ) : searchError ? (
-                  <div className="text-red-400 text-center">{searchError}</div>
-                ) : characters.length > 0 ? (
-                  <div className="space-y-3 sm:space-y-4">
-                    {characters.map((character) => (
-                      <div
-                        key={character.id}
-                        className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-900/50 rounded-lg sm:rounded-xl border border-gray-700 hover:border-gray-600 transition-all duration-300"
-                      >
-                        <div
-                          onClick={() => openModal(generateImageSrc(character))}
-                          className="flex-shrink-0"
-                        >
-                          <Image
-                            src={generateImageSrc(character)}
-                            alt={character.name}
-                            width={64}
-                            height={64}
-                            style={{ objectFit: "contain" }}
-                            unoptimized
-                            loading="lazy"
-                            className="w-12 h-12 md:w-16 md:h-16 rounded-full object-cover border-2 border-gray-700"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-xs sm:text-lg lg:text-sm xl:text-lg text-gray-200 truncate">
-                            {character.name}
-                          </div>
-                          <div className="text-xs sm:text-sm text-gray-400">
-                            {character.votes || 0} votes
-                          </div>
-                        </div>
-                        <WikiLink url={character.wiki_url} />
-                        <button
-                          onClick={async () => {
-                            await sleep(100);
-                            handleVote(character.id);
-                          }}
-                          className={`flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-white text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
-                            user && votesRemaining > 0
-                              ? "bg-blue-600 hover:bg-blue-700"
-                              : "bg-blue-600/50 cursor-not-allowed"
-                          } ${isPending ? "opacity-50 cursor-wait" : ""}`}
-                          disabled={!user || votesRemaining === 0 || isPending}
-                        >
-                          {isPending ? "..." : "Vote"}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-400 space-y-3 sm:space-y-4 p-4">
-                    <Search size={36} className="text-gray-600 sm:size-48" />
-                    <div className="text-base sm:text-lg font-medium text-center">
-                      {searchQuery
-                        ? "No characters found"
-                        : "Search for a character to vote"}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Top Characters Section */}
-          <div className="bg-gray-800/50 rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700 flex flex-col h-full">
-            <div className="p-4 sm:p-8">
-              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-                <Trophy className="text-yellow-500" size={24} />
-                <h2 className="text-2xl sm:text-3xl font-bold text-white">
-                  Top 10 Characters
-                </h2>
-              </div>
-            </div>
-
-            <div className="flex-1 mx-4 sm:mx-8 mb-4 sm:mb-8 overflow-y-auto space-y-3 sm:space-y-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent pr-2 sm:pr-4">
-              {topCharacters.map((character, index) => (
-                <div
+          ) : searchError ? (
+            <div className="paper p-6 text-center text-blood">{searchError}</div>
+          ) : characters.length > 0 ? (
+            <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-8 xl:grid-cols-4">
+              {characters.map((character, index) => (
+                <WantedPoster
                   key={character.id}
-                  className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-900/50 rounded-lg sm:rounded-xl border border-gray-700 hover:border-gray-600 hover:bg-gray-800/50 transition-all duration-300 hover:scale-[1.02] cursor-pointer"
-                >
-                  <div
-                    className={`font-bold text-lg sm:text-xl w-6 sm:w-8 ${
-                      index === 0
-                        ? "text-yellow-500"
-                        : index === 1
-                          ? "text-gray-400"
-                          : index === 2
-                            ? "text-amber-600"
-                            : "text-gray-500"
-                    }`}
-                  >
-                    #{index + 1}
-                  </div>
-                  <div className="relative">
-                    <div onClick={() => openModal(generateImageSrc(character))}>
-                      <Image
-                        src={generateImageSrc(character)}
-                        alt={character.name}
-                        style={{ objectFit: "contain" }}
-                        width={700}
-                        height={700}
-                        unoptimized
-                        className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700"
-                      />
-                    </div>
-                    {index < 3 && (
-                      <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2">
-                        <Trophy
-                          className={`h-4 w-4 sm:h-6 sm:w-6 ${
-                            index === 0
-                              ? "text-yellow-500"
-                              : index === 1
-                                ? "text-gray-400"
-                                : "text-amber-600"
-                          } fill-current`}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-base sm:text-lg text-gray-200 break-words">
-                      {character.name}
-                    </div>
-                    <WikiLink url={character.wiki_url} />
-                    <div className="text-xs sm:text-sm text-blue-400 font-medium">
-                      {(character.votes || 0).toLocaleString()} votes
-                    </div>
-                  </div>
-                </div>
+                  character={character}
+                  index={index}
+                  onImageClick={() => openModal(character)}
+                  onVote={async () => {
+                    await sleep(100);
+                    handleVote(character);
+                  }}
+                  voteDisabled={!canVote || isPending}
+                  voteLabel={isPending && lastVotedId === character.id ? "..." : "Vote"}
+                  justVoted={lastVotedId === character.id}
+                />
               ))}
             </div>
-          </div>
-        </div>
-      </main>
+          ) : (
+            <div className="flex flex-col items-center gap-3 py-24 text-paper-dark/70">
+              <Search size={40} />
+              <div className="text-lg font-bold">
+                {searchQuery
+                  ? "No one by that name on the board"
+                  : "Search for a character to vote"}
+              </div>
+            </div>
+          )}
+        </section>
+      </div>
+
       {selectedImage && (
         <ImageModal
           src={selectedImage}
@@ -391,6 +299,7 @@ export default function HomeContent() {
           onClose={closeModal}
         />
       )}
-    </div>
+      <Toast toast={toast} onDone={clearToast} />
+    </PageShell>
   );
 }
