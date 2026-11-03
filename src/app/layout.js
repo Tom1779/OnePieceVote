@@ -3,6 +3,20 @@ import { AuthProvider } from "../contexts/auth-context";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
+import { Rye, Alegreya } from "next/font/google";
+
+const display = Rye({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-display",
+});
+
+const serif = Alegreya({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-serif",
+});
 
 export const metadata = {
   title: "One Piece Character Voting",
@@ -51,7 +65,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html>
+    <html lang="en" className={`${display.variable} ${serif.variable}`}>
       <head>
         {/* Google Analytics */}
         <Script

@@ -1,110 +1,93 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
-import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Head from "next/head";
-import Image from "next/image";
 import { supabase } from "@/lib/supabase";
+import { generateImageSrc } from "@/lib/character-image";
 import ImageModal from "../components/ImageModal";
 import WikiLink from "../components/WikiLink";
+import PageShell from "../components/PageShell";
+import CharacterImage from "../components/CharacterImage";
+import WantedPoster, { Bounty } from "../components/WantedPoster";
+
+const PODIUM_LABELS = ["Captain", "First Mate", "Second Mate"];
+const RANK_COLORS = ["text-brass-dark", "text-ink-soft", "text-[#a5612b]"];
 
 // Skeleton component to prevent layout shift
 const SkeletonRow = () => (
-  <div className="grid grid-cols-[auto,1fr,auto] gap-2 sm:gap-4 p-3 sm:p-4 items-center animate-pulse">
-    <div className="w-12 sm:w-16 text-center">
-      <div className="h-4 bg-gray-700 rounded mx-auto w-8"></div>
+  <div className="grid grid-cols-[3rem,1fr,auto] items-center gap-3 border-b border-ink/15 px-3 py-3 animate-pulse sm:grid-cols-[4rem,1fr,auto] sm:px-5">
+    <div className="mx-auto h-4 w-8 rounded bg-paper-dark" />
+    <div className="flex items-center gap-3">
+      <div className="h-14 w-10 shrink-0 bg-paper-dark sm:h-16 sm:w-12" />
+      <div className="h-4 w-40 rounded bg-paper-dark" />
     </div>
-    <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-700 rounded-full flex-shrink-0"></div>
-      <div className="flex-1 min-w-0">
-        <div className="h-4 bg-gray-700 rounded mb-2"></div>
-        <div className="h-3 bg-gray-600 rounded w-20"></div>
-      </div>
-    </div>
-    <div className="w-16 sm:w-24 text-center">
-      <div className="h-4 bg-gray-700 rounded mx-auto w-12"></div>
-    </div>
+    <div className="h-4 w-16 rounded bg-paper-dark" />
   </div>
 );
-
-// Optimized character image component
-const CharacterImage = ({ character, onClick }) => {
-  const [hasError, setHasError] = useState(false);
-
-  const generateImageSrc = (character) => {
-    return `/characters/${character.name
-      .toLowerCase()
-      .replace(/ /g, "_")
-      .replace(/[^\p{L}\p{N}_-]/gu, "")}.png`;
-  };
-
-  // Simple blur placeholder
-  const shimmer = `data:image/svg+xml;base64,${Buffer.from(
-    `<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-      <rect width="64" height="64" fill="#374151"/>
-    </svg>`
-  ).toString("base64")}`;
-
-  return (
-    <div onClick={onClick} className="flex-shrink-0 cursor-pointer">
-      <Image
-        src={
-          hasError
-            ? "/images/character-placeholder.png"
-            : generateImageSrc(character)
-        }
-        alt={character.name}
-        width={64}
-        height={64}
-        className="!w-12 !h-12 sm:!w-16 sm:!h-16 rounded-full object-contain border-2 border-gray-700"
-        placeholder="blur"
-        blurDataURL={shimmer}
-        loading="lazy"
-        unoptimized
-        onError={() => setHasError(true)}
-      />
-    </div>
-  );
-};
 
 // Character row component
 const CharacterRow = ({ character, index, openModal }) => {
   return (
-    <div className="grid grid-cols-[auto,1fr,auto] gap-2 sm:gap-4 p-3 sm:p-4 items-center hover:bg-gray-900/50 transition-all duration-300 border-b border-gray-700 last:border-b-0">
+    <div className="grid grid-cols-[3rem,1fr,auto] items-center gap-3 border-b border-ink/15 px-3 py-2.5 transition-colors last:border-b-0 hover:bg-paper-dark/40 sm:grid-cols-[4rem,1fr,auto] sm:px-5">
       <div
-        className={`w-12 sm:w-16 text-center font-bold text-sm sm:text-base flex-shrink-0 ${
-          index === 0
-            ? "text-yellow-500"
-            : index === 1
-            ? "text-gray-400"
-            : index === 2
-            ? "text-amber-600"
-            : "text-gray-500"
+        className={`text-center font-display text-base sm:text-lg ${
+          RANK_COLORS[index] ?? "text-ink-faint"
         }`}
       >
-        #{index + 1}
+        {index + 1}
       </div>
-      <div className="flex items-center gap-2 sm:gap-4 min-w-0 overflow-hidden">
-        <CharacterImage
-          character={character}
+      <div className="flex min-w-0 items-center gap-3">
+        <button
+          type="button"
           onClick={() => openModal(character)}
-        />
-        <div className="flex-1 min-w-0 overflow-hidden">
-          <div className="font-medium text-sm sm:text-base text-gray-200 break-words">
+          className="shrink-0 border-2 border-ink/70"
+          aria-label={`View ${character.name} full size`}
+        >
+          <CharacterImage character={character} sizes={96} className="h-14 w-10 sm:h-16 sm:w-12" />
+        </button>
+        <div className="min-w-0">
+          <div className="break-words font-extrabold uppercase leading-tight tracking-wide sm:text-lg">
             {character.name}
           </div>
-        </div>
-        <div className="flex-shrink-0 ml-auto" onClick={(e) => e.stopPropagation()}>
           <WikiLink url={character.wiki_url} />
         </div>
       </div>
-      <div className="w-16 sm:w-24 text-center text-blue-400 font-medium text-sm sm:text-base flex-shrink-0">
-        {character.votes.toLocaleString()}
-      </div>
+      <Bounty votes={character.votes} className="justify-end text-base sm:text-lg" />
     </div>
   );
 };
+
+const Podium = ({ characters, openModal }) => (
+  <div className="mx-auto grid max-w-4xl grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:items-end sm:gap-x-8">
+    {characters.map((character, index) => (
+      <div
+        key={character.id}
+        className={
+          index === 0
+            ? "col-span-2 mx-auto w-3/4 sm:order-2 sm:col-span-1 sm:w-full sm:-translate-y-6"
+            : index === 1
+              ? "sm:order-1"
+              : "sm:order-3"
+        }
+      >
+        <div className="mb-3 text-center">
+          <div className={`font-display text-3xl sm:text-4xl ${index === 0 ? "text-brass" : "text-paper-dark"}`}>
+            No. {index + 1}
+          </div>
+          <div className="text-xs font-bold uppercase tracking-[0.3em] text-paper-dark/70">
+            {PODIUM_LABELS[index]}
+          </div>
+        </div>
+        <WantedPoster
+          character={character}
+          index={index + 1}
+          onImageClick={() => openModal(character)}
+        />
+      </div>
+    ))}
+  </div>
+);
 
 // Pagination component
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
@@ -149,9 +132,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
       onPageChange(pageNum);
       setPageInput(""); // Clear input after successful navigation
     } else if (pageInput) {
-      // Also clear invalid input and show brief feedback
       setPageInput("");
-      // Optional: You could add a brief error message here
     }
   };
 
@@ -163,43 +144,18 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     }
   };
 
-  return (
-    <div className="space-y-3 sm:space-y-4 py-4 sm:py-8">
-      {/* Page Jump Input */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-xs sm:text-sm text-gray-400">
-        <span className="text-center">Jump to page:</span>
-        <form
-          onSubmit={handlePageInputSubmit}
-          className="flex items-center gap-1 sm:gap-2"
-        >
-          <input
-            type="text"
-            value={pageInput}
-            onChange={handlePageInputChange}
-            placeholder="Page #"
-            className="w-14 sm:w-16 px-1 sm:px-2 py-1 bg-gray-800 border border-gray-600 rounded text-white text-center focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs sm:text-sm"
-            maxLength="3"
-          />
-          <span className="text-gray-500 text-xs sm:text-sm">
-            of {totalPages}
-          </span>
-          <button
-            type="submit"
-            className="px-2 sm:px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs sm:text-sm font-medium transition-colors"
-          >
-            Go
-          </button>
-        </form>
-      </div>
+  const pageButton =
+    "min-w-[36px] rounded-sm px-2 py-1.5 text-sm font-bold transition-colors sm:min-w-[40px] sm:px-3 sm:py-2";
 
-      {/* Regular Pagination */}
+  return (
+    <div className="space-y-4 py-6 sm:py-10">
       <div className="flex items-center justify-center gap-1 sm:gap-2">
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
-          className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm"
+          className={`${pageButton} flex items-center gap-1 text-paper-dark hover:bg-wood-700 disabled:opacity-40`}
         >
-          <ChevronLeft size={14} className="sm:size-8" />
+          <ChevronLeft size={18} />
           <span className="hidden sm:inline">Previous</span>
         </button>
 
@@ -209,12 +165,12 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
               key={index}
               onClick={() => typeof page === "number" && onPageChange(page)}
               disabled={page === "..."}
-              className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-colors text-xs sm:text-sm min-w-[32px] sm:min-w-[40px] ${
+              className={`${pageButton} ${
                 page === currentPage
-                  ? "bg-blue-600 text-white"
+                  ? "paper"
                   : page === "..."
-                  ? "text-gray-500 cursor-default"
-                  : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                    ? "cursor-default text-paper-dark/50"
+                    : "text-paper-dark hover:bg-wood-700"
               }`}
             >
               {page}
@@ -225,15 +181,45 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm"
+          className={`${pageButton} flex items-center gap-1 text-paper-dark hover:bg-wood-700 disabled:opacity-40`}
         >
           <span className="hidden sm:inline">Next</span>
-          <ChevronRight size={14} className="sm:size-8" />
+          <ChevronRight size={18} />
         </button>
       </div>
+
+      <form
+        onSubmit={handlePageInputSubmit}
+        className="flex items-center justify-center gap-2 text-sm text-paper-dark/80"
+      >
+        <span>Jump to page</span>
+        <input
+          type="text"
+          inputMode="numeric"
+          value={pageInput}
+          onChange={handlePageInputChange}
+          placeholder="#"
+          className="paper w-14 rounded-sm px-2 py-1 text-center focus:outline-none focus:ring-2 focus:ring-brass"
+          maxLength="3"
+        />
+        <span>of {totalPages}</span>
+        <button
+          type="submit"
+          className="rounded-sm bg-brass px-3 py-1 font-bold uppercase tracking-wider text-wood-950 hover:bg-brass-dark"
+        >
+          Go
+        </button>
+      </form>
     </div>
   );
 };
+
+const PageHeader = ({ subtitle }) => (
+  <header className="mb-8 text-center sm:mb-12">
+    <h1 className="font-display text-4xl text-paper sm:text-6xl">Bounty Rankings</h1>
+    {subtitle && <p className="mt-2 text-lg text-paper-dark/80">{subtitle}</p>}
+  </header>
+);
 
 const RankingsPage = () => {
   const [allCharacters, setAllCharacters] = useState([]);
@@ -245,11 +231,7 @@ const RankingsPage = () => {
   const CHARACTERS_PER_PAGE = 50;
 
   const openModal = (character) => {
-    const imageSrc = `/characters/${character.name
-      .toLowerCase()
-      .replace(/ /g, "_")
-      .replace(/[^\p{L}\p{N}_-]/gu, "")}.png`;
-    setSelectedImage(imageSrc);
+    setSelectedImage(generateImageSrc(character));
   };
 
   const closeModal = () => setSelectedImage(null);
@@ -289,35 +271,16 @@ const RankingsPage = () => {
   const endIndex = startIndex + CHARACTERS_PER_PAGE;
   const currentCharacters = allCharacters.slice(startIndex, endIndex);
 
+  // The first page shows the top 3 as a podium above the ledger
+  const showPodium = currentPage === 1 && currentCharacters.length >= 3;
+  const podium = showPodium ? currentCharacters.slice(0, 3) : [];
+  const ledger = showPodium ? currentCharacters.slice(3) : currentCharacters;
+  const ledgerStart = showPodium ? startIndex + 3 : startIndex;
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
-  // Layout wrapper
-  const PageLayout = ({ children }) => (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-      <nav className="bg-gray-900/80 sticky top-0 z-50 border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-14 sm:h-16 items-center">
-            <Link
-              href="/"
-              className="flex items-center gap-1 sm:gap-2 text-blue-400 hover:text-blue-300 transition-colors"
-            >
-              <ArrowLeft size={18} />
-              <span className="text-sm sm:text-base">Back to Voting</span>
-            </Link>
-            <div className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Character Rankings
-            </div>
-          </div>
-        </div>
-      </nav>
-      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
-        {children}
-      </main>
-    </div>
-  );
 
   if (loading) {
     return (
@@ -333,22 +296,14 @@ const RankingsPage = () => {
             href="https://www.onepiecevoting.com/rankings"
           />
         </Head>
-        <PageLayout>
-          <div className="bg-gray-800/50 rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700 overflow-hidden">
-            <div className="grid grid-cols-[auto,1fr,auto] gap-2 sm:gap-4 p-3 sm:p-4 border-b border-gray-700 bg-gray-900/50 font-semibold text-sm sm:text-base">
-              <div className="w-12 sm:w-16 text-center text-gray-400">Rank</div>
-              <div className="text-gray-400">Character</div>
-              <div className="w-16 sm:w-24 text-center text-blue-400">
-                Votes
-              </div>
-            </div>
-            <div>
-              {Array.from({ length: 15 }).map((_, i) => (
-                <SkeletonRow key={i} />
-              ))}
-            </div>
+        <PageShell>
+          <PageHeader />
+          <div className="paper mx-auto max-w-4xl">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <SkeletonRow key={i} />
+            ))}
           </div>
-        </PageLayout>
+        </PageShell>
       </>
     );
   }
@@ -367,14 +322,15 @@ const RankingsPage = () => {
             href="https://www.onepiecevoting.com/rankings"
           />
         </Head>
-        <PageLayout>
-          <div className="bg-gray-800/50 rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700 p-8 text-center">
-            <div className="text-red-400 text-lg mb-4">
+        <PageShell>
+          <PageHeader />
+          <div className="paper mx-auto max-w-xl p-8 text-center">
+            <div className="mb-2 font-display text-2xl text-blood">
               Error loading rankings
             </div>
-            <div className="text-gray-400">{error}</div>
+            <div className="text-ink-soft">{error}</div>
           </div>
-        </PageLayout>
+        </PageShell>
       </>
     );
   }
@@ -390,38 +346,36 @@ const RankingsPage = () => {
         <link rel="canonical" href="https://www.onepiecevoting.com/rankings" />
       </Head>
 
-      <PageLayout>
-        <div className="space-y-6">
-          {/* Stats */}
-          <div className="text-center text-gray-400">
-            Showing {startIndex + 1} -{" "}
-            {Math.min(endIndex, allCharacters.length)} of {allCharacters.length}{" "}
-            characters
+      <PageShell>
+        <PageHeader
+          subtitle={`${allCharacters.length.toLocaleString()} characters ranked by community votes`}
+        />
+
+        {showPodium && (
+          <div className="mb-12 sm:mb-16">
+            <Podium characters={podium} openModal={openModal} />
+          </div>
+        )}
+
+        <div className="mx-auto max-w-4xl">
+          <div className="mb-3 flex items-baseline justify-between text-sm text-paper-dark/80">
+            <span className="font-display text-xl text-paper">The Ledger</span>
+            <span>
+              Showing {ledgerStart + 1}–{Math.min(endIndex, allCharacters.length)}
+            </span>
           </div>
 
-          {/* Rankings Table */}
-          <div className="bg-gray-800/50 rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700 overflow-hidden">
-            <div className="grid grid-cols-[auto,1fr,auto] gap-2 sm:gap-4 p-3 sm:p-4 border-b border-gray-700 bg-gray-900/50 font-semibold text-sm sm:text-base">
-              <div className="w-12 sm:w-16 text-center text-gray-400">Rank</div>
-              <div className="text-gray-400">Character</div>
-              <div className="w-16 sm:w-24 text-center text-blue-400">
-                Votes
-              </div>
-            </div>
-
-            <div>
-              {currentCharacters.map((character, index) => (
-                <CharacterRow
-                  key={character.id}
-                  character={character}
-                  index={startIndex + index}
-                  openModal={openModal}
-                />
-              ))}
-            </div>
+          <div className="paper">
+            {ledger.map((character, index) => (
+              <CharacterRow
+                key={character.id}
+                character={character}
+                index={ledgerStart + index}
+                openModal={openModal}
+              />
+            ))}
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <Pagination
               currentPage={currentPage}
@@ -430,7 +384,7 @@ const RankingsPage = () => {
             />
           )}
         </div>
-      </PageLayout>
+      </PageShell>
 
       {selectedImage && (
         <ImageModal

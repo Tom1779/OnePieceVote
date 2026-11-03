@@ -7,7 +7,7 @@ export default function WikiLink({ url, className = "" }) {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`text-xs sm:text-sm text-blue-400 hover:text-blue-300 hover:underline transition-colors cursor-pointer inline-flex items-center gap-1 ${className}`}
+      className={`text-xs sm:text-sm font-bold text-ink-soft hover:text-blood hover:underline transition-colors cursor-pointer inline-flex items-center gap-1 ${className}`}
       onClick={(e) => e.stopPropagation()}
     >
       Wiki

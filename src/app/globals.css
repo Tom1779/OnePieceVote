@@ -3,19 +3,60 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 0, 0, 0;
-  --background-end-rgb: 0, 0, 0;
+  /* Fine paper grain, tinted brown, reused by the board and the posters */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .25 0 0 0 0 .16 0 0 0 0 .08 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  @apply bg-wood-900 text-paper-light font-serif;
+}
+
+@layer components {
+  /* Dark plank wall the posters are pinned to */
+  .board {
+    background-color: #211710;
+    background-image: var(--grain),
+      repeating-linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.18) 0 2px,
+        transparent 2px 180px
+      ),
+      radial-gradient(ellipse at top, #3a2818 0%, #211710 60%, #160f09 100%);
+    background-attachment: fixed;
+  }
+
+  /* Aged parchment with darkened, burnt-looking edges */
+  .paper {
+    background-color: #efe1bf;
+    background-image: var(--grain),
+      radial-gradient(
+        ellipse at center,
+        rgba(255, 250, 230, 0.55) 0%,
+        rgba(255, 250, 230, 0) 55%,
+        rgba(140, 100, 50, 0.28) 100%
+      );
+    box-shadow:
+      inset 0 0 0 1px rgba(120, 85, 40, 0.35),
+      inset 0 0 28px rgba(120, 80, 30, 0.35),
+      0 10px 24px -8px rgba(0, 0, 0, 0.7);
+    @apply text-ink;
+  }
+
+  /* Red rubber-stamp style button */
+  .stamp-btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-sm border-2 border-blood
+      bg-blood px-3 py-1.5 font-display text-base uppercase tracking-widest text-paper-light
+      shadow-[inset_0_0_0_2px_rgba(247,238,214,0.25)] transition
+      hover:bg-blood-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-brass
+      disabled:cursor-not-allowed disabled:border-ink-faint/60 disabled:bg-transparent disabled:text-ink-faint/80 disabled:shadow-none;
+  }
+
+  /* Brass tack holding a poster to the board */
+  .tack {
+    @apply absolute left-1/2 top-1.5 h-3 w-3 -translate-x-1/2 rounded-full;
+    background: radial-gradient(circle at 35% 35%, #f3d48a, #a87a2c 60%, #5e4429);
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.5);
+  }
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -24,21 +65,21 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(31, 41, 55, 0.5);
+  background: rgba(22, 15, 9, 0.4);
   border-radius: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(59, 130, 246, 0.5);
+  background: rgba(212, 162, 76, 0.5);
   border-radius: 4px;
   transition: all 0.2s ease;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(59, 130, 246, 0.8);
+  background: rgba(212, 162, 76, 0.8);
 }
 
 /* For Firefox */
 .custom-scrollbar {
-  scrollbar-color: rgba(59, 130, 246, 0.5) rgba(31, 41, 55, 0.5);
+  scrollbar-color: rgba(212, 162, 76, 0.5) rgba(22, 15, 9, 0.4);
 }
