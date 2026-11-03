@@ -2,9 +2,17 @@
 // src/contexts/auth-context.js
 "use client";
 
-import { createContext, useContext, useEffect, useState, useRef } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+} from "react";
 import { useRouter, usePathname } from "next/navigation"; // Add usePathname
 import { supabase } from "@/lib/supabase";
+import GoogleSignInDialog from "@/app/components/GoogleSignInDialog";
 
 const AuthContext = createContext({});
 
@@ -45,27 +53,31 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe();
   }, [router, pathname]); // Re-bind when pathname changes
 
-  const signIn = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          // Use hardcoded domain in production to prevent origin mismatches
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: { prompt: "select_account" },
-        },
-      });
-      if (error) throw error;
-    } catch (error) {
+  const [showSignIn, setShowSignIn] = useState(false);
+
+  // Google Identity Services runs on our own origin, so Google's account
+  // chooser names onepiecevoting.com instead of the supabase.co project
+  const signIn = () => setShowSignIn(true);
+  const closeSignIn = useCallback(() => setShowSignIn(false), []);
+
+  const handleGoogleCredential = useCallback(async (token, nonce) => {
+    const { error } = await supabase.auth.signInWithIdToken({
+      provider: "google",
+      token,
+      nonce,
+    });
+    if (error) {
       console.error("Sign-in error:", error);
       throw error;
     }
-  };
+    setShowSignIn(false);
+  }, []);
 
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      window.google?.accounts?.id?.disableAutoSelect();
       // router.refresh() is handled automatically by the listener above
     } catch (error) {
       console.error("Sign-out error:", error);
@@ -76,6 +88,12 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider value={{ user, signIn, signOut, loading }}>
       {children}
+      {showSignIn && !user && (
+        <GoogleSignInDialog
+          onCredential={handleGoogleCredential}
+          onClose={closeSignIn}
+        />
+      )}
     </AuthContext.Provider>
   );
 }
