@@ -36,3 +36,6 @@ yarn-error.log*
 
 #dataset
 /one_piece_characters.json
+
+# python
+__pycache__/
