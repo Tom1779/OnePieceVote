@@ -47,7 +47,7 @@ export const metadata = {
     siteName: "One Piece Voting",
     images: [
       {
-        url: "https://www.onepiecevoting.com/previews/home.png",
+        url: "https://www.onepiecevoting.com/previews/home-2026.jpg",
         width: 1200,
         height: 630,
       },
@@ -59,7 +59,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "One Piece Character Voting",
     description: "Vote for your favorite One Piece characters",
-    images: ["https://www.onepiecevoting.com/previews/home.png"],
+    images: ["https://www.onepiecevoting.com/previews/home-2026.jpg"],
   },
 };
 
