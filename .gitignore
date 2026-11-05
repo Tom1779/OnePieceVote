@@ -39,3 +39,6 @@ yarn-error.log*
 
 # python
 __pycache__/
+
+# claude code (local config and worktrees)
+.claude/
